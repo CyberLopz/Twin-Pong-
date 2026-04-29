@@ -30,8 +30,8 @@ body {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at top left, rgba(255, 105, 180, .22), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(160, 80, 255, .25), transparent 38%),
+    radial-gradient(circle at top left, rgba(255,105,180,.22), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(160,80,255,.25), transparent 38%),
     linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.55));
   z-index: -1;
 }
@@ -39,7 +39,7 @@ body {
 .screen {
   display: none;
   min-height: 100vh;
-  padding: 18px;
+  padding: 16px;
   animation: screenIn .35s ease;
 }
 
@@ -51,15 +51,13 @@ body {
 }
 
 h1 {
-  margin: 16px 0 6px;
-  font-size: clamp(36px, 10vw, 66px);
-  letter-spacing: 1px;
+  margin: 14px 0 6px;
+  font-size: clamp(34px, 9vw, 62px);
   background: linear-gradient(90deg, #ff4fb8, #ffd700, #9b5cff, #00eaff);
   background-size: 300%;
   -webkit-background-clip: text;
   color: transparent;
   animation: titleGlow 4s linear infinite;
-  text-shadow: 0 0 35px rgba(255,105,180,.35);
 }
 
 @keyframes titleGlow {
@@ -67,17 +65,13 @@ h1 {
   100% { background-position: 300%; }
 }
 
-.subtitle {
-  opacity: .9;
-  margin: 0 0 18px;
-  font-size: 16px;
-}
+.subtitle { opacity: .9; margin: 0 0 16px; }
 
-.card {
-  width: min(94%, 520px);
+.card, .panel {
+  width: min(94%, 540px);
   margin: 14px auto;
-  padding: 22px;
-  border-radius: 30px;
+  padding: 18px;
+  border-radius: 28px;
   background: rgba(255,255,255,.11);
   border: 1px solid rgba(255,255,255,.22);
   box-shadow:
@@ -89,8 +83,8 @@ h1 {
 .character-row {
   display: flex;
   justify-content: center;
-  gap: 18px;
-  margin: 20px 0;
+  gap: 16px;
+  margin: 18px 0;
 }
 
 .character {
@@ -99,7 +93,6 @@ h1 {
   border-radius: 24px;
   background: rgba(0,0,0,.32);
   border: 1px solid rgba(255,255,255,.22);
-  box-shadow: 0 0 22px rgba(255,255,255,.12);
   animation: floaty 3s ease-in-out infinite;
 }
 
@@ -119,70 +112,40 @@ h1 {
   box-shadow: 0 0 25px hotpink;
 }
 
-.character:nth-child(2) .avatar {
-  box-shadow: 0 0 25px violet;
-}
-
-.character-name {
-  font-weight: 900;
-  margin-top: 8px;
-}
+.character:nth-child(2) .avatar { box-shadow: 0 0 25px violet; }
 
 button {
-  margin: 9px;
-  padding: 15px 24px;
+  margin: 8px;
+  padding: 14px 22px;
   border: none;
   border-radius: 999px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 900;
   color: #18001f;
   background: linear-gradient(90deg, #ff4fb8, #ffd700, #9b5cff);
   box-shadow: 0 0 22px rgba(255,105,180,.45);
   cursor: pointer;
-  transition: transform .12s, box-shadow .12s;
 }
-
-button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 0 34px rgba(255,215,0,.75);
-}
-
-button:active { transform: scale(.94); }
 
 .score {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 900;
-  margin: 12px;
+  margin: 10px;
 }
 
-.panel {
-  width: min(94%, 520px);
-  margin: 14px auto;
-  padding: 14px 16px;
-  border-radius: 22px;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.18);
-  box-shadow: inset 0 0 20px rgba(255,255,255,.06);
-}
-
-/* Coin Game */
-.coin-container {
-  perspective: 1800px;
-  margin: 28px auto;
-}
+/* COIN */
+.coin-container { perspective: 1800px; margin: 24px auto; }
 
 .coin {
-  width: 235px;
-  height: 235px;
+  width: 225px;
+  height: 225px;
   margin: auto;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 2s cubic-bezier(.15,.85,.25,1.15);
 }
 
-.coin.spinning {
-  filter: blur(1.2px) brightness(1.25);
-}
+.coin.spinning { filter: blur(1.2px) brightness(1.25); }
 
 .coin-edge {
   position: absolute;
@@ -194,9 +157,7 @@ button:active { transform: scale(.94); }
     #fff3a0 9deg 13deg,
     #8a5800 13deg 20deg
   );
-  box-shadow:
-    0 0 52px rgba(255,215,0,.95),
-    inset 0 0 22px rgba(0,0,0,.55);
+  box-shadow: 0 0 52px rgba(255,215,0,.95);
 }
 
 .coin-face {
@@ -215,16 +176,10 @@ button:active { transform: scale(.94); }
   inset: 14px;
   border-radius: 50%;
   border: 4px double rgba(255,255,255,.85);
-  pointer-events: none;
 }
 
-.juliette-glow {
-  box-shadow: 0 0 45px hotpink, 0 0 95px rgba(255,105,180,.95);
-}
-
-.naomi-glow {
-  box-shadow: 0 0 45px violet, 0 0 95px rgba(180,90,255,.95);
-}
+.juliette-glow { box-shadow: 0 0 45px hotpink, 0 0 95px rgba(255,105,180,.95); }
+.naomi-glow { box-shadow: 0 0 45px violet, 0 0 95px rgba(180,90,255,.95); }
 
 .coin-img {
   width: 100%;
@@ -242,10 +197,10 @@ button:active { transform: scale(.94); }
   z-index: 3;
 }
 
-/* Pong */
-#pong {
+/* CANVASES */
+#pong, #rpgCanvas {
   display: block;
-  margin: 14px auto;
+  margin: 12px auto;
   width: min(95vw, 430px);
   height: auto;
   background: #05000a;
@@ -256,9 +211,23 @@ button:active { transform: scale(.94); }
     0 0 70px rgba(255,105,180,.25);
 }
 
-.shake {
-  animation: shake .18s linear;
+.rpgHud {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  width: min(95vw, 430px);
+  margin: 8px auto;
+  font-weight: 900;
 }
+
+.hudBox {
+  padding: 8px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.shake { animation: shake .18s linear; }
 
 @keyframes shake {
   0% { transform: translateX(0); }
@@ -287,52 +256,44 @@ button:active { transform: scale(.94); }
 <canvas id="bgCanvas"></canvas>
 <div class="overlay"></div>
 
-<!-- HOME -->
 <div id="home" class="screen active">
   <h1>Twin Games Deluxe</h1>
-  <p class="subtitle">Juliette vs Naomi: premium baby chaos arcade</p>
+  <p class="subtitle">Premium baby chaos arcade</p>
 
   <div class="card">
     <div class="character-row">
       <div class="character">
-        <img src="juliette.jpg?v=200" class="avatar" alt="Juliette">
-        <div class="character-name">👑 Juliette</div>
+        <img src="juliette.jpg?v=300" class="avatar" alt="Juliette">
+        <b>👑 Juliette</b><br>
         <small>Duchess Doo Doo</small>
       </div>
-
       <div class="character">
-        <img src="naomi.jpg?v=200" class="avatar" alt="Naomi">
-        <div class="character-name">🌙 Naomi</div>
+        <img src="naomi.jpg?v=300" class="avatar" alt="Naomi">
+        <b>🌙 Naomi</b><br>
         <small>Wide-Eyed Wildcard</small>
       </div>
     </div>
 
     <button onclick="goScreen('coinGame')">🪙 Flip for a Twin</button>
     <button onclick="goScreen('pongGame')">🏓 Twin Pong Deluxe</button>
+    <button onclick="goScreen('rpgGame')">🗺️ Twin Quest RPG</button>
     <button onclick="toggleMusic()">🎵 Music: <span id="musicText">Off</span></button>
   </div>
 </div>
 
-<!-- COIN GAME -->
 <div id="coinGame" class="screen">
   <h1>Flip for a Twin</h1>
-
-  <div class="score">
-    Juliette: <span id="coinJScore">0</span> |
-    Naomi: <span id="coinNScore">0</span>
-  </div>
+  <div class="score">Juliette: <span id="coinJScore">0</span> | Naomi: <span id="coinNScore">0</span></div>
 
   <div class="coin-container">
     <div id="coin" class="coin">
       <div class="coin-edge"></div>
-
       <div id="julietteFace" class="coin-face juliette-glow">
-        <img src="juliette.jpg?v=200" class="coin-img" alt="Juliette">
+        <img src="juliette.jpg?v=300" class="coin-img">
         <div class="label">Juliette</div>
       </div>
-
       <div id="naomiFace" class="coin-face naomi-glow">
-        <img src="naomi.jpg?v=200" class="coin-img" alt="Naomi">
+        <img src="naomi.jpg?v=300" class="coin-img">
         <div class="label">Naomi</div>
       </div>
     </div>
@@ -341,149 +302,145 @@ button:active { transform: scale(.94); }
   <button onclick="flipCoin()">FLIP</button>
   <button onclick="resetCoin()">RESET</button>
   <button onclick="goScreen('home')">⬅ MENU</button>
-
   <div id="coinResult" class="panel">Tap flip to let the twin council decide.</div>
 </div>
 
-<!-- PONG GAME -->
 <div id="pongGame" class="screen">
   <h1>Twin Pong Deluxe</h1>
-
-  <div class="score">
-    👑 Juliette: <span id="pongJScore">0</span> |
-    🌙 Naomi: <span id="pongNScore">0</span>
-  </div>
-
+  <div class="score">👑 Juliette: <span id="pongJScore">0</span> | 🌙 Naomi: <span id="pongNScore">0</span></div>
   <canvas id="pong" width="430" height="560"></canvas>
-
-  <div id="pongMessage" class="panel">
-    Move your finger or mouse to control Juliette. First to 7 wins.
-  </div>
-
+  <div id="pongMessage" class="panel">Move your finger or mouse to control Juliette. First to 7 wins.</div>
   <button onclick="resetPong()">RESET</button>
   <button onclick="goScreen('home')">⬅ MENU</button>
 </div>
 
+<div id="rpgGame" class="screen">
+  <h1>Twin Quest RPG</h1>
+
+  <div class="rpgHud">
+    <div class="hudBox">HP: <span id="rpgHp">5</span></div>
+    <div class="hudBox">LVL: <span id="rpgLevel">1</span></div>
+    <div class="hudBox">XP: <span id="rpgXp">0</span></div>
+  </div>
+
+  <div class="rpgHud">
+    <div class="hudBox">Bottles: <span id="rpgBottles">0</span>/5</div>
+    <div class="hudBox">Gems: <span id="rpgGems">0</span>/3</div>
+    <div class="hudBox">Boss: <span id="rpgBoss">Hidden</span></div>
+  </div>
+
+  <canvas id="rpgCanvas" width="430" height="560"></canvas>
+
+  <div id="rpgMessage" class="panel">
+    Quest: Collect 5 bottles and 3 gems, then defeat the Diaper Dragon.
+  </div>
+
+  <button onclick="resetRpg()">RESET QUEST</button>
+  <button onclick="goScreen('home')">⬅ MENU</button>
+</div>
+
 <script>
-/* Background Visualizer */
+/* BACKGROUND */
 const bg = document.getElementById("bgCanvas");
 const bgCtx = bg.getContext("2d");
 let stars = [];
 
 function resizeBg() {
-  bg.width = window.innerWidth;
-  bg.height = window.innerHeight;
-  stars = Array.from({length: 85}, () => ({
-    x: Math.random() * bg.width,
-    y: Math.random() * bg.height,
-    r: Math.random() * 2 + .5,
-    vx: (Math.random() - .5) * .35,
-    vy: Math.random() * .45 + .15,
-    hue: Math.random() < .5 ? 320 : 275
+  bg.width = innerWidth;
+  bg.height = innerHeight;
+  stars = Array.from({length: 90}, () => ({
+    x: Math.random()*bg.width,
+    y: Math.random()*bg.height,
+    r: Math.random()*2+.5,
+    vx: (Math.random()-.5)*.35,
+    vy: Math.random()*.45+.15,
+    hue: Math.random()<.5 ? 320 : 275
   }));
 }
-
-window.addEventListener("resize", resizeBg);
+addEventListener("resize", resizeBg);
 resizeBg();
 
 function drawBg() {
   bgCtx.clearRect(0,0,bg.width,bg.height);
-
-  const grad = bgCtx.createRadialGradient(bg.width/2, bg.height/2, 10, bg.width/2, bg.height/2, bg.width);
-  grad.addColorStop(0, "#22002f");
-  grad.addColorStop(1, "#020006");
+  const grad = bgCtx.createRadialGradient(bg.width/2,bg.height/2,10,bg.width/2,bg.height/2,bg.width);
+  grad.addColorStop(0,"#22002f");
+  grad.addColorStop(1,"#020006");
   bgCtx.fillStyle = grad;
   bgCtx.fillRect(0,0,bg.width,bg.height);
 
   stars.forEach(s => {
-    s.x += s.vx;
-    s.y += s.vy;
-    if (s.y > bg.height) s.y = -5;
-    if (s.x < 0) s.x = bg.width;
-    if (s.x > bg.width) s.x = 0;
-
+    s.x += s.vx; s.y += s.vy;
+    if(s.y > bg.height) s.y = -5;
+    if(s.x < 0) s.x = bg.width;
+    if(s.x > bg.width) s.x = 0;
     bgCtx.beginPath();
-    bgCtx.fillStyle = `hsla(${s.hue}, 100%, 75%, .75)`;
-    bgCtx.shadowColor = `hsl(${s.hue}, 100%, 70%)`;
+    bgCtx.fillStyle = `hsla(${s.hue},100%,75%,.75)`;
+    bgCtx.shadowColor = `hsl(${s.hue},100%,70%)`;
     bgCtx.shadowBlur = 12;
-    bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
     bgCtx.fill();
   });
-
   bgCtx.shadowBlur = 0;
   requestAnimationFrame(drawBg);
 }
 drawBg();
 
-/* Audio Engine */
-let audioCtx;
-let musicOn = false;
-let musicTimer = null;
-let currentScreen = "home";
+/* AUDIO */
+let audioCtx, musicOn = false, musicTimer = null, currentScreen = "home";
 
 function initAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === "suspended") audioCtx.resume();
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state === "suspended") audioCtx.resume();
 }
 
-function tone(freq, duration=.12, type="sine", vol=.08) {
+function tone(freq,duration=.12,type="sine",vol=.08) {
   initAudio();
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   osc.type = type;
   osc.frequency.value = freq;
-  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + duration);
+  gain.gain.setValueAtTime(vol,audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);
   osc.connect(gain);
   gain.connect(audioCtx.destination);
   osc.start();
-  osc.stop(audioCtx.currentTime + duration);
+  osc.stop(audioCtx.currentTime+duration);
 }
 
-function sfxClick() {
-  tone(700,.05,"square",.06);
-  setTimeout(()=>tone(1100,.06,"triangle",.05),45);
-}
-
-function sfxHit() {
-  tone(190,.04,"square",.08);
-  setTimeout(()=>tone(320,.05,"triangle",.06),35);
-}
-
-function sfxScore() {
-  tone(523,.08,"triangle",.08);
-  setTimeout(()=>tone(659,.08,"triangle",.08),80);
-  setTimeout(()=>tone(880,.13,"triangle",.08),160);
-}
-
-function sfxWin() {
-  tone(700,.08,"triangle",.08);
-  setTimeout(()=>tone(950,.1,"triangle",.08),90);
-  setTimeout(()=>tone(1250,.18,"sine",.07),190);
-}
-
-function sfxCoin() {
-  for (let i = 0; i < 14; i++) {
-    setTimeout(()=>tone(250 + i * 42, .035, "square", .045), i * 55);
-  }
-}
+function sfxClick(){ tone(700,.05,"square",.06); setTimeout(()=>tone(1100,.06,"triangle",.05),45); }
+function sfxHit(){ tone(190,.04,"square",.08); setTimeout(()=>tone(320,.05,"triangle",.06),35); }
+function sfxScore(){ tone(523,.08,"triangle",.08); setTimeout(()=>tone(659,.08,"triangle",.08),80); setTimeout(()=>tone(880,.13,"triangle",.08),160); }
+function sfxWin(){ tone(700,.08,"triangle",.08); setTimeout(()=>tone(950,.1,"triangle",.08),90); setTimeout(()=>tone(1250,.18,"sine",.07),190); }
+function sfxCoin(){ for(let i=0;i<14;i++) setTimeout(()=>tone(250+i*42,.035,"square",.045),i*55); }
+function sfxCollect(){ tone(880,.08,"triangle",.08); setTimeout(()=>tone(1200,.1,"sine",.07),70); }
+function sfxDamage(){ tone(120,.12,"sawtooth",.08); setTimeout(()=>tone(90,.18,"square",.06),90); }
 
 function playMusicPattern() {
-  if (!musicOn) return;
+  if(!musicOn) return;
 
-  const menuNotes = [261, 329, 392, 523, 392, 329];
-  const pongNotes = [110, 123, 147, 165, 196, 165, 147, 123];
+  let notes, speed, type;
 
-  let notes = currentScreen === "pongGame" ? pongNotes : menuNotes;
-  let speed = currentScreen === "pongGame" ? 130 : 260;
-  let type = currentScreen === "pongGame" ? "sawtooth" : "triangle";
+  if(currentScreen === "pongGame") {
+    notes = [110,123,147,165,196,165,147,123];
+    speed = 130;
+    type = "sawtooth";
+  } else if(currentScreen === "rpgGame") {
+    notes = [220,261,293,329,392,329,293,261];
+    speed = 210;
+    type = "triangle";
+  } else {
+    notes = [261,329,392,523,392,329];
+    speed = 260;
+    type = "triangle";
+  }
+
   let i = 0;
-
   clearInterval(musicTimer);
   musicTimer = setInterval(() => {
-    if (!musicOn) return;
-    tone(notes[i % notes.length], currentScreen === "pongGame" ? .11 : .2, type, currentScreen === "pongGame" ? .035 : .028);
-    if (currentScreen === "pongGame" && i % 2 === 0) tone(55, .08, "square", .025);
+    if(!musicOn) return;
+    tone(notes[i%notes.length], currentScreen === "pongGame" ? .11 : .2, type, currentScreen === "pongGame" ? .035 : .03);
+    if(currentScreen === "pongGame" && i%2===0) tone(55,.08,"square",.025);
+    if(currentScreen === "rpgGame" && i%4===0) tone(110,.15,"sine",.025);
     i++;
   }, speed);
 }
@@ -493,24 +450,19 @@ function toggleMusic() {
   musicOn = !musicOn;
   document.getElementById("musicText").textContent = musicOn ? "On" : "Off";
   sfxClick();
-
-  if (musicOn) playMusicPattern();
+  if(musicOn) playMusicPattern();
   else clearInterval(musicTimer);
 }
 
-/* Navigation */
 function goScreen(id) {
   initAudio();
   sfxClick();
-
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-
   currentScreen = id;
-  if (musicOn) playMusicPattern();
+  if(musicOn) playMusicPattern();
 }
 
-/* Confetti */
 function confetti(amount=80) {
   const colors = ["gold","hotpink","cyan","white","violet","#ff4fb8"];
   for(let i=0;i<amount;i++) {
@@ -524,290 +476,417 @@ function confetti(amount=80) {
   }
 }
 
-/* Coin Game */
-let coinJ = 0;
-let coinN = 0;
-let coinFlipping = false;
+/* COIN */
+let coinJ=0, coinN=0, coinFlipping=false;
 
 function showFace(winner) {
-  document.getElementById("julietteFace").style.display = winner === "Juliette" ? "block" : "none";
-  document.getElementById("naomiFace").style.display = winner === "Naomi" ? "block" : "none";
+  document.getElementById("julietteFace").style.display = winner==="Juliette" ? "block" : "none";
+  document.getElementById("naomiFace").style.display = winner==="Naomi" ? "block" : "none";
 }
 showFace("Juliette");
 
 function flipCoin() {
   initAudio();
-  if (coinFlipping) return;
+  if(coinFlipping) return;
+  coinFlipping=true;
 
-  coinFlipping = true;
-  const winner = Math.random() < .5 ? "Juliette" : "Naomi";
-  const coin = document.getElementById("coin");
-  const result = document.getElementById("coinResult");
+  const winner = Math.random()<.5 ? "Juliette" : "Naomi";
+  const coin=document.getElementById("coin");
+  const result=document.getElementById("coinResult");
 
-  result.textContent = "The coin is spinning dramatically...";
+  result.textContent="The coin is spinning dramatically...";
   coin.classList.add("spinning");
   sfxCoin();
 
-  coin.style.transition = "none";
-  coin.style.transform = "rotateY(0deg) rotateX(0deg)";
+  coin.style.transition="none";
+  coin.style.transform="rotateY(0deg) rotateX(0deg)";
   coin.offsetHeight;
 
-  coin.style.transition = "transform 2s cubic-bezier(.15,.85,.25,1.15)";
-  coin.style.transform = "rotateY(3960deg) rotateX(22deg)";
+  coin.style.transition="transform 2s cubic-bezier(.15,.85,.25,1.15)";
+  coin.style.transform="rotateY(3960deg) rotateX(22deg)";
 
-  setTimeout(() => {
+  setTimeout(()=>{
     showFace(winner);
     coin.classList.remove("spinning");
 
-    if (winner === "Juliette") {
+    if(winner==="Juliette") {
       coinJ++;
-      document.getElementById("coinJScore").textContent = coinJ;
-      result.textContent = "👑 Juliette wins! Duchess Doo Doo has spoken.";
+      document.getElementById("coinJScore").textContent=coinJ;
+      result.textContent="👑 Juliette wins! Duchess Doo Doo has spoken.";
     } else {
       coinN++;
-      document.getElementById("coinNScore").textContent = coinN;
-      result.textContent = "🌙 Naomi wins! The wide-eyed wildcard strikes again.";
+      document.getElementById("coinNScore").textContent=coinN;
+      result.textContent="🌙 Naomi wins! The wide-eyed wildcard strikes again.";
     }
 
     sfxWin();
     confetti(90);
-    coinFlipping = false;
-  }, 2000);
+    coinFlipping=false;
+  },2000);
 }
 
 function resetCoin() {
-  coinJ = 0;
-  coinN = 0;
-  document.getElementById("coinJScore").textContent = 0;
-  document.getElementById("coinNScore").textContent = 0;
-  document.getElementById("coinResult").textContent = "Scores reset. The twin council awaits.";
+  coinJ=0; coinN=0;
+  document.getElementById("coinJScore").textContent=0;
+  document.getElementById("coinNScore").textContent=0;
+  document.getElementById("coinResult").textContent="Scores reset. The twin council awaits.";
   showFace("Juliette");
   sfxClick();
 }
 
-/* Pong Deluxe */
-const canvas = document.getElementById("pong");
-const ctx = canvas.getContext("2d");
-
-let pj = 0, pn = 0;
-let paddleW = 14, paddleH = 92;
-let julietteY = 230, naomiY = 230;
-let pongOver = false;
-let particles = [];
-let trail = [];
-let shakeFrames = 0;
-
-let ball = {
-  x: canvas.width/2,
-  y: canvas.height/2,
-  vx: 4.6,
-  vy: 3.2,
-  size: 10
-};
+/* PONG */
+const canvas=document.getElementById("pong");
+const ctx=canvas.getContext("2d");
+let pj=0,pn=0,paddleW=14,paddleH=92,julietteY=230,naomiY=230,pongOver=false;
+let particles=[],trail=[],shakeFrames=0;
+let ball={x:canvas.width/2,y:canvas.height/2,vx:4.6,vy:3.2,size:10};
 
 function moveJuliette(clientY) {
-  const rect = canvas.getBoundingClientRect();
-  julietteY = clientY - rect.top - paddleH/2;
-  julietteY = Math.max(0, Math.min(canvas.height - paddleH, julietteY));
+  const rect=canvas.getBoundingClientRect();
+  julietteY=clientY-rect.top-paddleH/2;
+  julietteY=Math.max(0,Math.min(canvas.height-paddleH,julietteY));
 }
-
-canvas.addEventListener("mousemove", e => moveJuliette(e.clientY));
-canvas.addEventListener("touchmove", e => {
-  e.preventDefault();
-  moveJuliette(e.touches[0].clientY);
-}, { passive:false });
+canvas.addEventListener("mousemove",e=>moveJuliette(e.clientY));
+canvas.addEventListener("touchmove",e=>{e.preventDefault();moveJuliette(e.touches[0].clientY);},{passive:false});
 
 function addParticles(x,y,color,count=16) {
-  for(let i=0;i<count;i++) {
-    particles.push({
-      x,y,
-      vx:(Math.random()-.5)*6,
-      vy:(Math.random()-.5)*6,
-      life:34,
-      color
-    });
-  }
+  for(let i=0;i<count;i++) particles.push({x,y,vx:(Math.random()-.5)*6,vy:(Math.random()-.5)*6,life:34,color});
 }
 
-function resetBall(direction = 1) {
-  ball.x = canvas.width/2;
-  ball.y = canvas.height/2;
-  ball.vx = 4.6 * direction;
-  ball.vy = (Math.random()*5)-2.5;
-  trail = [];
-}
+function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
 
 function drawArena() {
-  const grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 20, canvas.width/2, canvas.height/2, 360);
-  grd.addColorStop(0, "rgba(255,105,180,.18)");
-  grd.addColorStop(.55, "rgba(95,0,140,.18)");
-  grd.addColorStop(1, "rgba(0,0,0,1)");
-  ctx.fillStyle = grd;
+  const grd=ctx.createRadialGradient(canvas.width/2,canvas.height/2,20,canvas.width/2,canvas.height/2,360);
+  grd.addColorStop(0,"rgba(255,105,180,.18)");
+  grd.addColorStop(.55,"rgba(95,0,140,.18)");
+  grd.addColorStop(1,"rgba(0,0,0,1)");
+  ctx.fillStyle=grd;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  ctx.strokeStyle = "rgba(255,255,255,.08)";
-  ctx.lineWidth = 1;
+  ctx.strokeStyle="rgba(255,255,255,.08)";
+  for(let y=0;y<canvas.height;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+  for(let x=0;x<canvas.width;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
 
-  for(let y=0; y<canvas.height; y+=28) {
-    ctx.beginPath();
-    ctx.moveTo(0,y);
-    ctx.lineTo(canvas.width,y);
-    ctx.stroke();
-  }
-
-  for(let x=0; x<canvas.width; x+=28) {
-    ctx.beginPath();
-    ctx.moveTo(x,0);
-    ctx.lineTo(x,canvas.height);
-    ctx.stroke();
-  }
-
-  ctx.fillStyle = "rgba(255,255,255,.25)";
-  for(let y=0; y<canvas.height; y+=28) {
-    ctx.fillRect(canvas.width/2-1, y, 2, 14);
-  }
+  ctx.fillStyle="rgba(255,255,255,.25)";
+  for(let y=0;y<canvas.height;y+=28) ctx.fillRect(canvas.width/2-1,y,2,14);
 }
 
 function drawPong() {
-  if (shakeFrames > 0) {
-    canvas.classList.add("shake");
-    shakeFrames--;
-  } else {
-    canvas.classList.remove("shake");
-  }
+  if(shakeFrames>0){canvas.classList.add("shake");shakeFrames--;} else canvas.classList.remove("shake");
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drawArena();
 
-  trail.forEach((t, i) => {
-    ctx.globalAlpha = i / trail.length;
-    ctx.fillStyle = "gold";
-    ctx.shadowColor = "gold";
-    ctx.shadowBlur = 18;
-    ctx.beginPath();
-    ctx.arc(t.x,t.y,ball.size*(i/trail.length),0,Math.PI*2);
-    ctx.fill();
+  trail.forEach((t,i)=>{
+    ctx.globalAlpha=i/trail.length;
+    ctx.fillStyle="gold"; ctx.shadowColor="gold"; ctx.shadowBlur=18;
+    ctx.beginPath();ctx.arc(t.x,t.y,ball.size*(i/trail.length),0,Math.PI*2);ctx.fill();
   });
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha=1;
 
-  ctx.shadowBlur = 22;
-  ctx.shadowColor = "hotpink";
-  ctx.fillStyle = "hotpink";
-  roundRect(12, julietteY, paddleW, paddleH, 8);
+  ctx.shadowBlur=22;
+  ctx.shadowColor="hotpink"; ctx.fillStyle="hotpink"; roundRect(12,julietteY,paddleW,paddleH,8);
+  ctx.shadowColor="violet"; ctx.fillStyle="violet"; roundRect(canvas.width-26,naomiY,paddleW,paddleH,8);
 
-  ctx.shadowColor = "violet";
-  ctx.fillStyle = "violet";
-  roundRect(canvas.width-26, naomiY, paddleW, paddleH, 8);
-
-  particles.forEach(p => {
-    ctx.globalAlpha = p.life/34;
-    ctx.fillStyle = p.color;
-    ctx.shadowColor = p.color;
-    ctx.shadowBlur = 14;
-    ctx.fillRect(p.x,p.y,5,5);
+  particles.forEach(p=>{
+    ctx.globalAlpha=p.life/34; ctx.fillStyle=p.color; ctx.shadowColor=p.color; ctx.shadowBlur=14; ctx.fillRect(p.x,p.y,5,5);
   });
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha=1;
 
-  ctx.shadowColor = "gold";
-  ctx.shadowBlur = 25;
-  ctx.fillStyle = "white";
-  ctx.beginPath();
-  ctx.arc(ball.x,ball.y,ball.size,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.shadowBlur = 0;
+  ctx.shadowColor="gold"; ctx.shadowBlur=25; ctx.fillStyle="white";
+  ctx.beginPath();ctx.arc(ball.x,ball.y,ball.size,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;
 }
 
-function roundRect(x,y,w,h,r) {
-  ctx.beginPath();
-  ctx.roundRect(x,y,w,h,r);
-  ctx.fill();
-}
+function resetBall(direction=1){ball.x=canvas.width/2;ball.y=canvas.height/2;ball.vx=4.6*direction;ball.vy=(Math.random()*5)-2.5;trail=[];}
 
 function updatePong() {
-  if (pongOver || !document.getElementById("pongGame").classList.contains("active")) return;
+  if(pongOver || !document.getElementById("pongGame").classList.contains("active")) return;
 
-  ball.x += ball.vx;
-  ball.y += ball.vy;
+  ball.x+=ball.vx; ball.y+=ball.vy;
+  trail.push({x:ball.x,y:ball.y}); if(trail.length>16) trail.shift();
 
-  trail.push({x:ball.x,y:ball.y});
-  if(trail.length > 16) trail.shift();
+  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life--;});
+  particles=particles.filter(p=>p.life>0);
 
-  particles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.life--;
-  });
-  particles = particles.filter(p => p.life > 0);
+  if(ball.y<ball.size || ball.y>canvas.height-ball.size){ball.vy*=-1;sfxHit();addParticles(ball.x,ball.y,"cyan",10);shakeFrames=3;}
 
-  if(ball.y < ball.size || ball.y > canvas.height - ball.size) {
-    ball.vy *= -1;
-    sfxHit();
-    addParticles(ball.x,ball.y,"cyan",10);
-    shakeFrames = 3;
+  const aiSpeed=.085+Math.min((pj+pn)*.006,.05);
+  naomiY+=((ball.y-paddleH/2)-naomiY)*aiSpeed;
+  naomiY=Math.max(0,Math.min(canvas.height-paddleH,naomiY));
+
+  if(ball.x-ball.size<28 && ball.y>julietteY && ball.y<julietteY+paddleH && ball.vx<0){
+    ball.vx=Math.abs(ball.vx)+.24; ball.vy+=(ball.y-(julietteY+paddleH/2))*.05; sfxHit(); addParticles(ball.x,ball.y,"hotpink",18); shakeFrames=4;
   }
 
-  const aiSpeed = 0.085 + Math.min((pj+pn)*0.006, .05);
-  naomiY += ((ball.y - paddleH/2) - naomiY) * aiSpeed;
-  naomiY = Math.max(0, Math.min(canvas.height - paddleH, naomiY));
-
-  if(ball.x-ball.size < 28 && ball.y > julietteY && ball.y < julietteY+paddleH && ball.vx < 0) {
-    ball.vx = Math.abs(ball.vx) + .24;
-    ball.vy += (ball.y - (julietteY+paddleH/2)) * .05;
-    sfxHit();
-    addParticles(ball.x,ball.y,"hotpink",18);
-    shakeFrames = 4;
+  if(ball.x+ball.size>canvas.width-28 && ball.y>naomiY && ball.y<naomiY+paddleH && ball.vx>0){
+    ball.vx=-Math.abs(ball.vx)-.24; ball.vy+=(ball.y-(naomiY+paddleH/2))*.05; sfxHit(); addParticles(ball.x,ball.y,"violet",18); shakeFrames=4;
   }
 
-  if(ball.x+ball.size > canvas.width-28 && ball.y > naomiY && ball.y < naomiY+paddleH && ball.vx > 0) {
-    ball.vx = -Math.abs(ball.vx) - .24;
-    ball.vy += (ball.y - (naomiY+paddleH/2)) * .05;
-    sfxHit();
-    addParticles(ball.x,ball.y,"violet",18);
-    shakeFrames = 4;
-  }
+  if(ball.x<-25){pn++;document.getElementById("pongNScore").textContent=pn;sfxScore();addParticles(canvas.width/2,canvas.height/2,"violet",35);resetBall(1);}
+  if(ball.x>canvas.width+25){pj++;document.getElementById("pongJScore").textContent=pj;sfxScore();addParticles(canvas.width/2,canvas.height/2,"hotpink",35);resetBall(-1);}
 
-  if(ball.x < -25) {
-    pn++;
-    document.getElementById("pongNScore").textContent = pn;
-    sfxScore();
-    addParticles(canvas.width/2, canvas.height/2, "violet",35);
-    resetBall(1);
-  }
-
-  if(ball.x > canvas.width + 25) {
-    pj++;
-    document.getElementById("pongJScore").textContent = pj;
-    sfxScore();
-    addParticles(canvas.width/2, canvas.height/2, "hotpink",35);
-    resetBall(-1);
-  }
-
-  if(pj >= 7) endPong("👑 Juliette wins! Duchess Doo Doo dominates the deluxe arena.");
-  if(pn >= 7) endPong("🌙 Naomi wins! The wide-eyed wildcard becomes pong champion.");
+  if(pj>=7) endPong("👑 Juliette wins! Duchess Doo Doo dominates the deluxe arena.");
+  if(pn>=7) endPong("🌙 Naomi wins! The wide-eyed wildcard becomes pong champion.");
 }
 
-function endPong(msg) {
-  pongOver = true;
-  document.getElementById("pongMessage").textContent = msg;
-  sfxWin();
-  confetti(120);
-}
+function endPong(msg){pongOver=true;document.getElementById("pongMessage").textContent=msg;sfxWin();confetti(120);}
+function resetPong(){pj=0;pn=0;pongOver=false;julietteY=230;naomiY=230;particles=[];trail=[];document.getElementById("pongJScore").textContent=0;document.getElementById("pongNScore").textContent=0;document.getElementById("pongMessage").textContent="Move your finger or mouse to control Juliette. First to 7 wins.";resetBall(Math.random()<.5?1:-1);sfxClick();}
 
-function resetPong() {
-  pj=0; pn=0; pongOver=false;
-  julietteY=230; naomiY=230;
-  particles=[]; trail=[];
-  document.getElementById("pongJScore").textContent = 0;
-  document.getElementById("pongNScore").textContent = 0;
-  document.getElementById("pongMessage").textContent = "Move your finger or mouse to control Juliette. First to 7 wins.";
-  resetBall(Math.random() < .5 ? 1 : -1);
+/* RPG */
+const rpg=document.getElementById("rpgCanvas");
+const rctx=rpg.getContext("2d");
+
+let keys={}, target=null;
+let rpgState;
+
+function resetRpg() {
+  rpgState = {
+    hp:5, level:1, xp:0, bottles:0, gems:0, won:false,
+    player:{x:70,y:470,r:16},
+    naomi:{x:45,y:495,r:14},
+    boss:{x:350,y:75,r:28,hp:6,active:false},
+    items:[],
+    enemies:[],
+    particles:[]
+  };
+
+  for(let i=0;i<5;i++) rpgState.items.push({type:"bottle",x:60+Math.random()*310,y:80+Math.random()*360,r:11});
+  for(let i=0;i<3;i++) rpgState.items.push({type:"gem",x:70+Math.random()*300,y:90+Math.random()*330,r:10});
+  for(let i=0;i<4;i++) rpgState.enemies.push({x:80+Math.random()*280,y:100+Math.random()*320,r:15,vx:(Math.random()-.5)*1.6,vy:(Math.random()-.5)*1.6,cool:0});
+
+  updateRpgHud();
+  document.getElementById("rpgMessage").textContent="Quest: Collect 5 bottles and 3 gems, then defeat the Diaper Dragon.";
   sfxClick();
 }
 
+resetRpg();
+
+addEventListener("keydown",e=>keys[e.key.toLowerCase()]=true);
+addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+
+rpg.addEventListener("mousemove",e=>{
+  if(!document.getElementById("rpgGame").classList.contains("active")) return;
+  const rect=rpg.getBoundingClientRect();
+  target={x:(e.clientX-rect.left)*(rpg.width/rect.width),y:(e.clientY-rect.top)*(rpg.height/rect.height)};
+});
+
+rpg.addEventListener("touchmove",e=>{
+  e.preventDefault();
+  const rect=rpg.getBoundingClientRect();
+  target={x:(e.touches[0].clientX-rect.left)*(rpg.width/rect.width),y:(e.touches[0].clientY-rect.top)*(rpg.height/rect.height)};
+},{passive:false});
+
+rpg.addEventListener("click",()=>{
+  if(rpgState.boss.active && dist(rpgState.player,rpgState.boss)<65) {
+    rpgState.boss.hp--;
+    sfxHit();
+    burst(rpgState.boss.x,rpgState.boss.y,"orange",20);
+    if(rpgState.boss.hp<=0) winRpg();
+  }
+});
+
+function updateRpgHud() {
+  document.getElementById("rpgHp").textContent=rpgState.hp;
+  document.getElementById("rpgLevel").textContent=rpgState.level;
+  document.getElementById("rpgXp").textContent=rpgState.xp;
+  document.getElementById("rpgBottles").textContent=rpgState.bottles;
+  document.getElementById("rpgGems").textContent=rpgState.gems;
+  document.getElementById("rpgBoss").textContent=rpgState.boss.active ? "Awake" : "Hidden";
+}
+
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+
+function burst(x,y,color,count=12) {
+  for(let i=0;i<count;i++) rpgState.particles.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,life:28,color});
+}
+
+function gainXp(amount) {
+  rpgState.xp+=amount;
+  if(rpgState.xp>=5) {
+    rpgState.xp=0;
+    rpgState.level++;
+    rpgState.hp=Math.min(7,rpgState.hp+1);
+    document.getElementById("rpgMessage").textContent="Level up! The twin power grows stronger.";
+    sfxWin();
+  }
+}
+
+function updateRpg() {
+  if(!document.getElementById("rpgGame").classList.contains("active") || rpgState.won) return;
+
+  let p=rpgState.player;
+  let speed=2.4 + rpgState.level*.18;
+
+  if(keys["arrowup"]||keys["w"]) p.y-=speed;
+  if(keys["arrowdown"]||keys["s"]) p.y+=speed;
+  if(keys["arrowleft"]||keys["a"]) p.x-=speed;
+  if(keys["arrowright"]||keys["d"]) p.x+=speed;
+
+  if(target) {
+    let dx=target.x-p.x, dy=target.y-p.y, d=Math.hypot(dx,dy);
+    if(d>4){p.x+=dx/d*speed;p.y+=dy/d*speed;}
+  }
+
+  p.x=Math.max(20,Math.min(rpg.width-20,p.x));
+  p.y=Math.max(20,Math.min(rpg.height-20,p.y));
+
+  let n=rpgState.naomi;
+  let dx=p.x-28-n.x, dy=p.y+22-n.y, d=Math.hypot(dx,dy);
+  if(d>2){n.x+=dx/d*1.9;n.y+=dy/d*1.9;}
+
+  rpgState.items = rpgState.items.filter(item=>{
+    if(dist(p,item)<p.r+item.r) {
+      if(item.type==="bottle") rpgState.bottles++;
+      if(item.type==="gem") rpgState.gems++;
+      gainXp(1);
+      sfxCollect();
+      burst(item.x,item.y,item.type==="bottle"?"cyan":"gold",16);
+
+      if(rpgState.bottles>=5 && rpgState.gems>=3 && !rpgState.boss.active) {
+        rpgState.boss.active=true;
+        document.getElementById("rpgMessage").textContent="The Diaper Dragon awakens! Tap near it to attack.";
+        sfxDamage();
+      }
+      updateRpgHud();
+      return false;
+    }
+    return true;
+  });
+
+  rpgState.enemies.forEach(e=>{
+    e.x+=e.vx; e.y+=e.vy;
+    if(e.x<25 || e.x>rpg.width-25) e.vx*=-1;
+    if(e.y<65 || e.y>rpg.height-25) e.vy*=-1;
+    if(e.cool>0) e.cool--;
+
+    if(dist(p,e)<p.r+e.r && e.cool<=0) {
+      rpgState.hp--;
+      e.cool=70;
+      sfxDamage();
+      burst(p.x,p.y,"red",20);
+      document.getElementById("rpgMessage").textContent="A Diaper Goblin bonked Juliette! Keep moving.";
+      updateRpgHud();
+
+      if(rpgState.hp<=0) {
+        document.getElementById("rpgMessage").textContent="Quest failed! The diaper chaos was too powerful. Hit reset.";
+        rpgState.won=true;
+      }
+    }
+  });
+
+  if(rpgState.boss.active && dist(p,rpgState.boss)<p.r+rpgState.boss.r && Math.random()<.015) {
+    rpgState.hp--;
+    sfxDamage();
+    burst(p.x,p.y,"orange",22);
+    updateRpgHud();
+    if(rpgState.hp<=0) {
+      document.getElementById("rpgMessage").textContent="The Diaper Dragon wins this round. Hit reset.";
+      rpgState.won=true;
+    }
+  }
+
+  rpgState.particles.forEach(pt=>{pt.x+=pt.vx;pt.y+=pt.vy;pt.life--;});
+  rpgState.particles=rpgState.particles.filter(pt=>pt.life>0);
+}
+
+function winRpg() {
+  rpgState.won=true;
+  document.getElementById("rpgMessage").textContent="Victory! Juliette and Naomi defeated the Diaper Dragon and saved nap time.";
+  sfxWin();
+  confetti(140);
+}
+
+function drawRpg() {
+  rctx.clearRect(0,0,rpg.width,rpg.height);
+
+  const grd=rctx.createLinearGradient(0,0,rpg.width,rpg.height);
+  grd.addColorStop(0,"#14001f");
+  grd.addColorStop(.5,"#2a0044");
+  grd.addColorStop(1,"#020006");
+  rctx.fillStyle=grd;
+  rctx.fillRect(0,0,rpg.width,rpg.height);
+
+  rctx.strokeStyle="rgba(255,255,255,.08)";
+  for(let x=0;x<rpg.width;x+=32){rctx.beginPath();rctx.moveTo(x,0);rctx.lineTo(x,rpg.height);rctx.stroke();}
+  for(let y=0;y<rpg.height;y+=32){rctx.beginPath();rctx.moveTo(0,y);rctx.lineTo(rpg.width,y);rctx.stroke();}
+
+  rctx.fillStyle="rgba(255,215,0,.15)";
+  rctx.beginPath();rctx.arc(350,75,50,0,Math.PI*2);rctx.fill();
+
+  rpgState.items.forEach(item=>{
+    rctx.shadowBlur=18;
+    rctx.shadowColor=item.type==="bottle"?"cyan":"gold";
+    rctx.fillStyle=item.type==="bottle"?"#8ff":"gold";
+    rctx.beginPath();rctx.arc(item.x,item.y,item.r,0,Math.PI*2);rctx.fill();
+    rctx.shadowBlur=0;
+    rctx.fillStyle="#000";
+    rctx.font="14px Arial";
+    rctx.fillText(item.type==="bottle"?"🍼":"💎",item.x-8,item.y+5);
+  });
+
+  rpgState.enemies.forEach(e=>{
+    rctx.shadowBlur=16;
+    rctx.shadowColor="lime";
+    rctx.fillStyle="#4cff6a";
+    rctx.beginPath();rctx.arc(e.x,e.y,e.r,0,Math.PI*2);rctx.fill();
+    rctx.shadowBlur=0;
+    rctx.fillStyle="#000";
+    rctx.font="16px Arial";
+    rctx.fillText("💩",e.x-9,e.y+6);
+  });
+
+  if(rpgState.boss.active) {
+    let b=rpgState.boss;
+    rctx.shadowBlur=28;
+    rctx.shadowColor="orange";
+    rctx.fillStyle="#ff6a00";
+    rctx.beginPath();rctx.arc(b.x,b.y,b.r,0,Math.PI*2);rctx.fill();
+    rctx.shadowBlur=0;
+    rctx.fillStyle="white";
+    rctx.font="24px Arial";
+    rctx.fillText("🐉",b.x-15,b.y+8);
+    rctx.font="13px Arial";
+    rctx.fillText("HP " + b.hp,b.x-17,b.y-35);
+  }
+
+  rctx.shadowBlur=24;
+  rctx.shadowColor="violet";
+  rctx.fillStyle="violet";
+  rctx.beginPath();rctx.arc(rpgState.naomi.x,rpgState.naomi.y,rpgState.naomi.r,0,Math.PI*2);rctx.fill();
+  rctx.shadowBlur=0;
+  rctx.fillStyle="white";
+  rctx.font="16px Arial";
+  rctx.fillText("🌙",rpgState.naomi.x-9,rpgState.naomi.y+6);
+
+  rctx.shadowBlur=24;
+  rctx.shadowColor="hotpink";
+  rctx.fillStyle="hotpink";
+  rctx.beginPath();rctx.arc(rpgState.player.x,rpgState.player.y,rpgState.player.r,0,Math.PI*2);rctx.fill();
+  rctx.shadowBlur=0;
+  rctx.fillStyle="white";
+  rctx.font="17px Arial";
+  rctx.fillText("👑",rpgState.player.x-10,rpgState.player.y+6);
+
+  rpgState.particles.forEach(pt=>{
+    rctx.globalAlpha=pt.life/28;
+    rctx.fillStyle=pt.color;
+    rctx.shadowColor=pt.color;
+    rctx.shadowBlur=14;
+    rctx.fillRect(pt.x,pt.y,5,5);
+  });
+  rctx.globalAlpha=1;
+  rctx.shadowBlur=0;
+}
+
+/* MAIN LOOP */
 function loop() {
   updatePong();
   drawPong();
+
+  updateRpg();
+  drawRpg();
+
   requestAnimationFrame(loop);
 }
 loop();
