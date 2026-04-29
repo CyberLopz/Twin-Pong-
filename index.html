@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twin Pong</title>
+
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(circle, #1a001f, #000);
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+
+h1 {
+  margin: 10px;
+  background: linear-gradient(90deg, hotpink, violet);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+canvas {
+  display: block;
+  margin: auto;
+  background: black;
+  border: 3px solid gold;
+  border-radius: 10px;
+}
+
+.score {
+  font-size: 22px;
+  margin: 10px;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  background: linear-gradient(90deg, hotpink, violet);
+  color: black;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏓 Twin Pong 🏓</h1>
+
+<div class="score">
+👑 Juliette: <span id="jScore">0</span> |
+🌙 Naomi: <span id="nScore">0</span>
+</div>
+
+<canvas id="game" width="350" height="500"></canvas>
+
+<div id="message"></div>
+<button onclick="resetGame()">RESET</button>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let jScore = 0;
+let nScore = 0;
+
+const paddleWidth = 12;
+const paddleHeight = 80;
+
+let julietteY = 200;
+let naomiY = 200;
+
+let ball = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  vx: 4,
+  vy: 3,
+  size: 10
+};
+
+let gameOver = false;
+
+/* CONTROLS */
+document.addEventListener("mousemove", e => {
+  const rect = canvas.getBoundingClientRect();
+  julietteY = e.clientY - rect.top - paddleHeight/2;
+});
+
+/* MOBILE TOUCH */
+canvas.addEventListener("touchmove", e => {
+  const rect = canvas.getBoundingClientRect();
+  julietteY = e.touches[0].clientY - rect.top - paddleHeight/2;
+});
+
+/* DRAW */
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Ball
+  ctx.fillStyle = "white";
+  ctx.fillRect(ball.x, ball.y, ball.size, ball.size);
+
+  // Juliette paddle (pink)
+  ctx.fillStyle = "hotpink";
+  ctx.fillRect(10, julietteY, paddleWidth, paddleHeight);
+
+  // Naomi paddle (purple)
+  ctx.fillStyle = "violet";
+  ctx.fillRect(canvas.width - 20, naomiY, paddleWidth, paddleHeight);
+}
+
+/* UPDATE */
+function update() {
+  if(gameOver) return;
+
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  // Wall bounce
+  if(ball.y < 0 || ball.y > canvas.height - ball.size) {
+    ball.vy *= -1;
+  }
+
+  // Juliette hit
+  if(ball.x < 25 &&
+     ball.y > julietteY &&
+     ball.y < julietteY + paddleHeight) {
+    ball.vx *= -1;
+  }
+
+  // Naomi AI movement
+  let target = ball.y - paddleHeight/2;
+  naomiY += (target - naomiY) * 0.08;
+
+  // Naomi hit
+  if(ball.x > canvas.width - 30 &&
+     ball.y > naomiY &&
+     ball.y < naomiY + paddleHeight) {
+    ball.vx *= -1;
+  }
+
+  // Score
+  if(ball.x < 0) {
+    nScore++;
+    resetBall();
+  }
+
+  if(ball.x > canvas.width) {
+    jScore++;
+    resetBall();
+  }
+
+  document.getElementById("jScore").textContent = jScore;
+  document.getElementById("nScore").textContent = nScore;
+
+  checkWin();
+}
+
+/* RESET BALL */
+function resetBall() {
+  ball.x = canvas.width / 2;
+  ball.y = canvas.height / 2;
+  ball.vx *= -1;
+}
+
+/* WIN */
+function checkWin() {
+  if(jScore >= 5) {
+    endGame("👑 Juliette wins! Duchess Doo Doo dominates the court.");
+  }
+  if(nScore >= 5) {
+    endGame("🌙 Naomi wins! The mysterious baby AI cannot be stopped.");
+  }
+}
+
+function endGame(msg) {
+  document.getElementById("message").textContent = msg;
+  gameOver = true;
+}
+
+/* RESET GAME */
+function resetGame() {
+  jScore = 0;
+  nScore = 0;
+  gameOver = false;
+  document.getElementById("message").textContent = "";
+  resetBall();
+}
+
+/* LOOP */
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
