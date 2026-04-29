@@ -39,7 +39,8 @@ body {
 .screen {
   display: none;
   min-height: 100vh;
-  padding: 16px;
+  padding: 14px;
+  overflow-y: auto;
   animation: screenIn .35s ease;
 }
 
@@ -64,8 +65,6 @@ h1 {
   0% { background-position: 0%; }
   100% { background-position: 300%; }
 }
-
-.subtitle { opacity: .9; margin: 0 0 16px; }
 
 .card, .panel {
   width: min(94%, 540px);
@@ -133,6 +132,45 @@ button {
   margin: 10px;
 }
 
+.arcade-board {
+  width: min(94%, 540px);
+  margin: 14px auto;
+  padding: 14px;
+  border-radius: 18px;
+  background: #050005;
+  border: 2px solid gold;
+  box-shadow:
+    0 0 25px rgba(255,215,0,.65),
+    inset 0 0 18px rgba(255,105,180,.18);
+  font-family: "Courier New", monospace;
+  color: #ffd700;
+  text-align: left;
+}
+
+.arcade-board h3 {
+  margin: 0 0 10px;
+  text-align: center;
+  color: hotpink;
+  text-shadow: 0 0 10px hotpink;
+}
+
+.arcade-board ol {
+  margin: 0;
+  padding-left: 28px;
+}
+
+.arcade-board li {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.arcade-board button {
+  display: block;
+  margin: 12px auto 0;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
 /* COIN */
 .coin-container { perspective: 1800px; margin: 24px auto; }
 
@@ -168,14 +206,6 @@ button {
   border: 10px ridge #d4af37;
   z-index: 2;
   background: gold;
-}
-
-.coin-face::after {
-  content: "";
-  position: absolute;
-  inset: 14px;
-  border-radius: 50%;
-  border: 4px double rgba(255,255,255,.85);
 }
 
 .juliette-glow { box-shadow: 0 0 45px hotpink, 0 0 95px rgba(255,105,180,.95); }
@@ -258,17 +288,17 @@ button {
 
 <div id="home" class="screen active">
   <h1>Twin Games Deluxe</h1>
-  <p class="subtitle">Premium baby chaos arcade</p>
+  <p>Premium baby chaos arcade</p>
 
   <div class="card">
     <div class="character-row">
       <div class="character">
-        <img src="juliette.jpg?v=300" class="avatar" alt="Juliette">
+        <img src="juliette.jpg?v=500" class="avatar" alt="Juliette">
         <b>👑 Juliette</b><br>
         <small>Duchess Doo Doo</small>
       </div>
       <div class="character">
-        <img src="naomi.jpg?v=300" class="avatar" alt="Naomi">
+        <img src="naomi.jpg?v=500" class="avatar" alt="Naomi">
         <b>🌙 Naomi</b><br>
         <small>Wide-Eyed Wildcard</small>
       </div>
@@ -276,7 +306,7 @@ button {
 
     <button onclick="goScreen('coinGame')">🪙 Flip for a Twin</button>
     <button onclick="goScreen('pongGame')">🏓 Twin Pong Deluxe</button>
-    <button onclick="window.location.href='adventure.html'">🗺️ Twin Quest: Neon Nursery</button>
+    <button onclick="goScreen('rpgGame')">🗺️ Twin Quest RPG</button>
     <button onclick="toggleMusic()">🎵 Music: <span id="musicText">Off</span></button>
   </div>
 </div>
@@ -289,11 +319,11 @@ button {
     <div id="coin" class="coin">
       <div class="coin-edge"></div>
       <div id="julietteFace" class="coin-face juliette-glow">
-        <img src="juliette.jpg?v=300" class="coin-img">
+        <img src="juliette.jpg?v=500" class="coin-img">
         <div class="label">Juliette</div>
       </div>
       <div id="naomiFace" class="coin-face naomi-glow">
-        <img src="naomi.jpg?v=300" class="coin-img">
+        <img src="naomi.jpg?v=500" class="coin-img">
         <div class="label">Naomi</div>
       </div>
     </div>
@@ -302,7 +332,14 @@ button {
   <button onclick="flipCoin()">FLIP</button>
   <button onclick="resetCoin()">RESET</button>
   <button onclick="goScreen('home')">⬅ MENU</button>
+
   <div id="coinResult" class="panel">Tap flip to let the twin council decide.</div>
+
+  <div class="arcade-board">
+    <h3>🪙 COIN HIGH SCORES</h3>
+    <ol id="coinLeaderboard"></ol>
+    <button onclick="clearScores('coin')">CLEAR SCORES</button>
+  </div>
 </div>
 
 <div id="pongGame" class="screen">
@@ -310,8 +347,15 @@ button {
   <div class="score">👑 Juliette: <span id="pongJScore">0</span> | 🌙 Naomi: <span id="pongNScore">0</span></div>
   <canvas id="pong" width="430" height="560"></canvas>
   <div id="pongMessage" class="panel">Move your finger or mouse to control Juliette. First to 7 wins.</div>
+
   <button onclick="resetPong()">RESET</button>
   <button onclick="goScreen('home')">⬅ MENU</button>
+
+  <div class="arcade-board">
+    <h3>🏓 PONG HIGH SCORES</h3>
+    <ol id="pongLeaderboard"></ol>
+    <button onclick="clearScores('pong')">CLEAR SCORES</button>
+  </div>
 </div>
 
 <div id="rpgGame" class="screen">
@@ -337,9 +381,66 @@ button {
 
   <button onclick="resetRpg()">RESET QUEST</button>
   <button onclick="goScreen('home')">⬅ MENU</button>
+
+  <div class="arcade-board">
+    <h3>🗺️ QUEST HIGH SCORES</h3>
+    <ol id="rpgLeaderboard"></ol>
+    <button onclick="clearScores('rpg')">CLEAR SCORES</button>
+  </div>
 </div>
 
 <script>
+/* LEADERBOARDS */
+function getScores(game) {
+  return JSON.parse(localStorage.getItem(game + "Scores")) || [];
+}
+
+function saveScore(game, name, score) {
+  let scores = getScores(game);
+
+  scores.push({
+    name: name,
+    score: score,
+    date: new Date().toLocaleDateString()
+  });
+
+  scores.sort((a, b) => b.score - a.score);
+  scores = scores.slice(0, 5);
+
+  localStorage.setItem(game + "Scores", JSON.stringify(scores));
+  renderLeaderboard(game);
+}
+
+function renderLeaderboard(game) {
+  const board = document.getElementById(game + "Leaderboard");
+  if (!board) return;
+
+  const scores = getScores(game);
+  board.innerHTML = "";
+
+  if (scores.length === 0) {
+    board.innerHTML = "<li>NO SCORES YET</li>";
+    return;
+  }
+
+  scores.forEach((s, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${index + 1}. ${s.name} - ${s.score} PTS - ${s.date}`;
+    board.appendChild(li);
+  });
+}
+
+function renderAllLeaderboards() {
+  renderLeaderboard("coin");
+  renderLeaderboard("pong");
+  renderLeaderboard("rpg");
+}
+
+function clearScores(game) {
+  localStorage.removeItem(game + "Scores");
+  renderLeaderboard(game);
+}
+
 /* BACKGROUND */
 const bg = document.getElementById("bgCanvas");
 const bgCtx = bg.getContext("2d");
@@ -519,6 +620,7 @@ function flipCoin() {
       result.textContent="🌙 Naomi wins! The wide-eyed wildcard strikes again.";
     }
 
+    saveScore("coin", winner.toUpperCase(), winner === "Juliette" ? coinJ : coinN);
     sfxWin();
     confetti(90);
     coinFlipping=false;
@@ -630,8 +732,26 @@ function updatePong() {
   if(pn>=7) endPong("🌙 Naomi wins! The wide-eyed wildcard becomes pong champion.");
 }
 
-function endPong(msg){pongOver=true;document.getElementById("pongMessage").textContent=msg;sfxWin();confetti(120);}
-function resetPong(){pj=0;pn=0;pongOver=false;julietteY=230;naomiY=230;particles=[];trail=[];document.getElementById("pongJScore").textContent=0;document.getElementById("pongNScore").textContent=0;document.getElementById("pongMessage").textContent="Move your finger or mouse to control Juliette. First to 7 wins.";resetBall(Math.random()<.5?1:-1);sfxClick();}
+function endPong(msg){
+  pongOver=true;
+  document.getElementById("pongMessage").textContent=msg;
+
+  const winner = pj > pn ? "JULIETTE" : "NAOMI";
+  const score = Math.max(pj, pn) * 100;
+
+  saveScore("pong", winner, score);
+  sfxWin();
+  confetti(120);
+}
+
+function resetPong(){
+  pj=0;pn=0;pongOver=false;julietteY=230;naomiY=230;particles=[];trail=[];
+  document.getElementById("pongJScore").textContent=0;
+  document.getElementById("pongNScore").textContent=0;
+  document.getElementById("pongMessage").textContent="Move your finger or mouse to control Juliette. First to 7 wins.";
+  resetBall(Math.random()<.5?1:-1);
+  sfxClick();
+}
 
 /* RPG */
 const rpg=document.getElementById("rpgCanvas");
@@ -710,6 +830,7 @@ function gainXp(amount) {
     document.getElementById("rpgMessage").textContent="Level up! The twin power grows stronger.";
     sfxWin();
   }
+  updateRpgHud();
 }
 
 function updateRpg() {
@@ -745,7 +866,7 @@ function updateRpg() {
 
       if(rpgState.bottles>=5 && rpgState.gems>=3 && !rpgState.boss.active) {
         rpgState.boss.active=true;
-        document.getElementById("rpgMessage").textContent="The Diaper Dragon awakens! Tap near it to attack.";
+        document.getElementById("rpgMessage").textContent="The Diaper Dragon awakens! Click near it to attack.";
         sfxDamage();
       }
       updateRpgHud();
@@ -793,6 +914,14 @@ function updateRpg() {
 function winRpg() {
   rpgState.won=true;
   document.getElementById("rpgMessage").textContent="Victory! Juliette and Naomi defeated the Diaper Dragon and saved nap time.";
+
+  const finalScore =
+    (rpgState.level * 1000) +
+    ((rpgState.bottles + rpgState.gems) * 500) +
+    (rpgState.hp * 250);
+
+  saveScore("rpg", "JULIETTE + NAOMI", finalScore);
+
   sfxWin();
   confetti(140);
 }
@@ -810,9 +939,6 @@ function drawRpg() {
   rctx.strokeStyle="rgba(255,255,255,.08)";
   for(let x=0;x<rpg.width;x+=32){rctx.beginPath();rctx.moveTo(x,0);rctx.lineTo(x,rpg.height);rctx.stroke();}
   for(let y=0;y<rpg.height;y+=32){rctx.beginPath();rctx.moveTo(0,y);rctx.lineTo(rpg.width,y);rctx.stroke();}
-
-  rctx.fillStyle="rgba(255,215,0,.15)";
-  rctx.beginPath();rctx.arc(350,75,50,0,Math.PI*2);rctx.fill();
 
   rpgState.items.forEach(item=>{
     rctx.shadowBlur=18;
@@ -883,12 +1009,12 @@ function drawRpg() {
 function loop() {
   updatePong();
   drawPong();
-
   updateRpg();
   drawRpg();
-
   requestAnimationFrame(loop);
 }
+
+renderAllLeaderboards();
 loop();
 </script>
 </body>
