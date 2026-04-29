@@ -29,6 +29,13 @@ button{margin:8px;padding:14px 22px;border:0;border-radius:999px;font-size:16px;
 .controls{position:fixed;inset:0;pointer-events:none;z-index:5}.touchBtn{position:fixed;width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);display:grid;place-items:center;font-size:24px;pointer-events:auto;backdrop-filter:blur(6px);box-shadow:0 0 18px rgba(255,255,255,.18)}#attackBtn{right:22px;bottom:34px}#dashBtn{right:105px;bottom:34px}#joyBase{position:fixed;left:28px;bottom:34px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.09);border:2px solid rgba(255,255,255,.25);pointer-events:auto;display:none}#joyStick{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,79,184,.85);box-shadow:0 0 20px hotpink}.rpg-active #joyBase{display:block}.rpg-active #attackBtn,.rpg-active #dashBtn{display:grid}.touchBtn{display:none}
 .shake{animation:shake .18s linear}@keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-4px)}}.confetti{position:fixed;top:-12px;width:9px;height:15px;z-index:99;animation:fall 2.2s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
 @media(max-width:520px){.screen{padding-bottom:120px}.character{width:135px}.avatar{width:98px;height:98px}button{font-size:15px;padding:13px 18px}}
+
+/* Learning Mode */
+.learn-stage{width:min(94%,620px);margin:14px auto;padding:18px;border-radius:28px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.24);box-shadow:0 0 45px rgba(255,255,255,.18),inset 0 0 30px rgba(255,255,255,.06)}
+.learn-card{width:min(86vw,360px);height:min(86vw,360px);margin:16px auto;border-radius:34px;background:#fff;color:#000;border:8px solid #000;display:grid;place-items:center;box-shadow:0 0 35px rgba(255,255,255,.65);position:relative;overflow:hidden}
+.learn-card.dark{background:#000;color:#fff;border-color:#fff;box-shadow:0 0 35px rgba(255,255,255,.45)}
+.learn-symbol{font-size:clamp(86px,30vw,150px);font-weight:900;line-height:1;text-shadow:none;filter:grayscale(1) contrast(1.25)}
+.learn-word{font-family:'Courier New',monospace;font-size:clamp(24px,8vw,42px);font-weight:900;letter-spacing:2px;margin-top:8px}.learn-sub{opacity:.9;font-size:16px}.learn-progress{width:min(86vw,360px);height:14px;margin:12px auto;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden;border:1px solid rgba(255,255,255,.28)}#learnProgressBar{height:100%;width:0%;background:linear-gradient(90deg,#fff,#999,#fff);transition:width .25s}.soft-flash{animation:softFlash .35s ease}@keyframes softFlash{50%{transform:scale(1.04);filter:brightness(1.35)}}
 </style>
 </head>
 <body>
@@ -46,6 +53,7 @@ button{margin:8px;padding:14px 22px;border:0;border-radius:999px;font-size:16px;
     <button onclick="goScreen('coinGame')">🪙 Flip for a Twin</button>
     <button onclick="goScreen('pongGame')">🏓 Twin Pong Deluxe</button>
     <button onclick="goScreen('rpgGame')">🗺️ Neon Nursery RPG</button>
+    <button onclick="goScreen('learnGame')">🖤🤍 Twin Learning Cards</button>
     <button onclick="toggleMusic()">🎵 Music: <span id="musicText">Off</span></button>
   </div>
 </div>
@@ -78,6 +86,35 @@ button{margin:8px;padding:14px 22px;border:0;border-radius:999px;font-size:16px;
   <div class="arcade-board"><h3>🗺️ QUEST HIGH SCORES</h3><ol id="rpgLeaderboard"></ol><button onclick="clearScores('rpg')">CLEAR SCORES</button></div>
 </div>
 
+<div id="learnGame" class="screen">
+  <h1>Twin Learning Cards</h1>
+  <p class="subtitle">High-contrast black and white imagery for simple visual learning.</p>
+
+  <div class="learn-stage">
+    <div id="learnCard" class="learn-card">
+      <div>
+        <div id="learnSymbol" class="learn-symbol">●</div>
+        <div id="learnWord" class="learn-word">CIRCLE</div>
+      </div>
+    </div>
+
+    <div class="learn-progress"><div id="learnProgressBar"></div></div>
+    <div id="learnPrompt" class="panel">Look at the shape. Say the word out loud.</div>
+
+    <button onclick="prevLearnCard()">⬅ Previous</button>
+    <button onclick="nextLearnCard()">Next ➡</button>
+    <button onclick="toggleLearnContrast()">Invert Contrast</button>
+    <button onclick="repeatLearnCard()">🔊 Sound</button>
+    <button onclick="goScreen('home')">⬅ MENU</button>
+  </div>
+
+  <div class="arcade-board">
+    <h3>🖤🤍 LEARNING PROGRESS</h3>
+    <ol id="learnLeaderboard"></ol>
+    <button onclick="clearScores('learn')">CLEAR PROGRESS</button>
+  </div>
+</div>
+
 <script>
 /* Leaderboards */
 function getScores(game){return JSON.parse(localStorage.getItem(game+'Scores'))||[]}
@@ -91,7 +128,7 @@ const sf=document.getElementById('starfield'),sctx=sf.getContext('2d');let stars
 /* Audio */
 let audioCtx,musicOn=false,musicTimer=null,currentScreen='home';function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}function tone(f,d=.12,t='sine',v=.06){initAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}
 function sfxClick(){tone(700,.05,'square',.06);setTimeout(()=>tone(1100,.06,'triangle',.05),45)}function sfxHit(){tone(190,.04,'square',.08);setTimeout(()=>tone(320,.05,'triangle',.06),35)}function sfxScore(){tone(523,.08,'triangle',.08);setTimeout(()=>tone(659,.08,'triangle',.08),80);setTimeout(()=>tone(880,.13,'triangle',.08),160)}function sfxWin(){tone(700,.08,'triangle',.08);setTimeout(()=>tone(950,.1,'triangle',.08),90);setTimeout(()=>tone(1250,.18,'sine',.07),190)}function sfxCoin(){for(let i=0;i<14;i++)setTimeout(()=>tone(250+i*42,.035,'square',.045),i*55)}function sfxCollect(){tone(880,.08,'triangle',.08);setTimeout(()=>tone(1200,.1,'sine',.07),70)}function sfxDamage(){tone(120,.12,'sawtooth',.08);setTimeout(()=>tone(90,.18,'square',.06),90)}
-function playMusicPattern(){if(!musicOn)return;let notes,speed,type;if(currentScreen==='pongGame'){notes=[110,123,147,165,196,165,147,123];speed=130;type='sawtooth'}else if(currentScreen==='rpgGame'){notes=[146,174,220,261,293,261,220,174];speed=170;type='triangle'}else{notes=[261,329,392,523,392,329];speed=260;type='triangle'}let i=0;clearInterval(musicTimer);musicTimer=setInterval(()=>{if(!musicOn)return;tone(notes[i%notes.length],currentScreen==='pongGame'?.11:.18,type,currentScreen==='pongGame'?.035:.026);if(currentScreen==='pongGame'&&i%2===0)tone(55,.08,'square',.024);if(currentScreen==='rpgGame'&&i%4===0)tone(73,.12,'sine',.026);i++},speed)}function toggleMusic(){initAudio();musicOn=!musicOn;document.getElementById('musicText').textContent=musicOn?'On':'Off';sfxClick();if(musicOn)playMusicPattern();else clearInterval(musicTimer)}
+function playMusicPattern(){if(!musicOn)return;let notes,speed,type;if(currentScreen==='pongGame'){notes=[110,123,147,165,196,165,147,123];speed=130;type='sawtooth'}else if(currentScreen==='rpgGame'){notes=[146,174,220,261,293,261,220,174];speed=170;type='triangle'}else if(currentScreen==='learnGame'){notes=[392,440,392,330,294,330];speed=420;type='sine'}else{notes=[261,329,392,523,392,329];speed=260;type='triangle'}let i=0;clearInterval(musicTimer);musicTimer=setInterval(()=>{if(!musicOn)return;tone(notes[i%notes.length],currentScreen==='pongGame'?.11:.18,type,currentScreen==='pongGame'?.035:.026);if(currentScreen==='pongGame'&&i%2===0)tone(55,.08,'square',.024);if(currentScreen==='rpgGame'&&i%4===0)tone(73,.12,'sine',.026);i++},speed)}function toggleMusic(){initAudio();musicOn=!musicOn;document.getElementById('musicText').textContent=musicOn?'On':'Off';sfxClick();if(musicOn)playMusicPattern();else clearInterval(musicTimer)}
 function goScreen(id){initAudio();sfxClick();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');currentScreen=id;document.body.classList.toggle('rpg-active',id==='rpgGame');if(musicOn)playMusicPattern()}function confetti(amount=90){const colors=['gold','hotpink','cyan','white','violet','#ff4fb8'];for(let i=0;i<amount;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.animationDelay=Math.random()*.4+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),2400)}}
 
 /* Coin */
@@ -106,6 +143,28 @@ function resetRpg(){rpgState={hp:10,maxHp:10,level:1,xp:0,relics:0,combo:0,won:f
 function damagePlayer(v,src){if(rpgState.player.inv>0)return;rpgState.hp-=v;rpgState.player.inv=45;rpgState.combo=0;sfxDamage();burst(rpgState.player.x,rpgState.player.y,'red',24);popText(rpgState.player.x,rpgState.player.y,'-'+v,'red');if(src){let dx=rpgState.player.x-src.x,dy=rpgState.player.y-src.y,d=Math.hypot(dx,dy)||1;rpgState.player.x+=dx/d*24;rpgState.player.y+=dy/d*24}if(rpgState.hp<=0){rpgState.dead=true;document.getElementById('rpgMessage').textContent='Quest failed. The diaper chaos was too powerful. Reset to try again.'}updateRpgHud()}function attackRpg(){if(!document.getElementById('rpgGame').classList.contains('active')||rpgState.dead||rpgState.won)return;sfxHit();let p=rpgState.player,hit=false;burst(p.x,p.y,'hotpink',10);rpgState.enemies.forEach(e=>{if(e.hp>0&&dist(p,e)<64){e.hp-=rpgState.level;hit=true;burst(e.x,e.y,'lime',18);popText(e.x,e.y,'-'+rpgState.level,'#ff8');if(e.hp<=0){rpgState.combo++;gainXp(1);rpgState.score+=rpgState.combo*50;popText(e.x,e.y,'COMBO '+rpgState.combo,'gold')}}});if(rpgState.boss.active&&dist(p,rpgState.boss)<82){rpgState.boss.hp-=rpgState.level;hit=true;burst(rpgState.boss.x,rpgState.boss.y,'orange',25);popText(rpgState.boss.x,rpgState.boss.y,'-'+rpgState.level,'gold');if(rpgState.boss.hp<=0)winRpg()}if(!hit)rpgState.combo=0;updateRpgHud()}function dashRpg(){let p=rpgState.player;if(p.dash>0)return;let dx=0,dy=0;if(keys.w||keys.arrowup)dy-=1;if(keys.s||keys.arrowdown)dy+=1;if(keys.a||keys.arrowleft)dx-=1;if(keys.d||keys.arrowright)dx+=1;if(joy.active){dx=joy.x;dy=joy.y}let d=Math.hypot(dx,dy)||1;p.x+=dx/d*86;p.y+=dy/d*86;p.dash=55;p.inv=15;burst(p.x,p.y,'cyan',22)}
 function updateRpg(){if(!document.getElementById('rpgGame').classList.contains('active')||rpgState.dead||rpgState.won)return;let p=rpgState.player,dx=0,dy=0,spd=2.5+rpgState.level*.18;if(keys.w||keys.arrowup)dy-=1;if(keys.s||keys.arrowdown)dy+=1;if(keys.a||keys.arrowleft)dx-=1;if(keys.d||keys.arrowright)dx+=1;if(joy.active){dx=joy.x;dy=joy.y}let d=Math.hypot(dx,dy);if(d>.1){p.x+=dx/d*spd;p.y+=dy/d*spd}p.x=Math.max(24,Math.min(rpg.width-24,p.x));p.y=Math.max(70,Math.min(rpg.height-24,p.y));if(p.inv>0)p.inv--;if(p.dash>0)p.dash--;let n=rpgState.naomi,ndx=p.x-38-n.x,ndy=p.y+28-n.y,nd=Math.hypot(ndx,ndy);if(nd>3){n.x+=ndx/nd*1.8;n.y+=ndy/nd*1.8}rpgState.items=rpgState.items.filter(it=>{if(dist(p,it)<p.r+it.r){rpgState.relics++;rpgState.score+=500;gainXp(1);sfxCollect();burst(it.x,it.y,'gold',25);popText(it.x,it.y,'RELIC','gold');if(rpgState.relics>=6&&!rpgState.boss.active){rpgState.boss.active=true;document.getElementById('rpgMessage').textContent='The Diaper Dragon awakens. Attack when close!';sfxDamage()}updateRpgHud();return false}return true});rpgState.enemies.forEach(e=>{if(e.hp<=0)return;if(e.cool>0)e.cool--;let chase=dist(p,e)<210;if(chase){let ex=p.x-e.x,ey=p.y-e.y,ed=Math.hypot(ex,ey)||1,es=e.type==='brute'?1.25:1.7;e.x+=ex/ed*es;e.y+=ey/ed*es}else{e.x+=e.vx;e.y+=e.vy}if(e.x<25||e.x>rpg.width-25)e.vx*=-1;if(e.y<70||e.y>rpg.height-25)e.vy*=-1;if(dist(p,e)<p.r+e.r&&e.cool<=0){e.cool=70;damagePlayer(e.type==='brute'?2:1,e)}});if(rpgState.boss.active){let b=rpgState.boss,bd=dist(p,b);b.cool--;if(bd<350){let bx=p.x-b.x,by=p.y-b.y,d=Math.hypot(bx,by)||1;b.x+=bx/d*(b.hp<7?1.4:.9);b.y+=by/d*(b.hp<7?1.4:.9)}if(bd<p.r+b.r)damagePlayer(2,b);if(b.cool<=0){b.cool=b.hp<7?45:80;rpgState.enemies.push({x:b.x,y:b.y,r:10,hp:1,maxHp:1,vx:(p.x-b.x)/80,vy:(p.y-b.y)/80,cool:0,type:'fire'});burst(b.x,b.y,'orange',18)}}rpgState.parts.forEach(pt=>{pt.x+=pt.vx;pt.y+=pt.vy;pt.life--});rpgState.parts=rpgState.parts.filter(pt=>pt.life>0);rpgState.texts.forEach(t=>{t.y-=1;t.life--});rpgState.texts=rpgState.texts.filter(t=>t.life>0)}function winRpg(){rpgState.won=true;let final=(rpgState.level*1000)+(rpgState.relics*700)+(rpgState.hp*300)+rpgState.score;saveScore('rpg','JULIETTE + NAOMI',final);document.getElementById('rpgMessage').textContent='VICTORY! The Diaper Dragon is defeated. Nap time is saved.';sfxWin();confetti(150)}
 function draw3DToken(x,y,r,color,emoji,glow){rctx.shadowBlur=0;rctx.fillStyle='rgba(0,0,0,.45)';rctx.beginPath();rctx.ellipse(x,y+r+8,r*1.15,r*.38,0,0,Math.PI*2);rctx.fill();let side=rctx.createLinearGradient(x-r,y-r,x+r,y+r);side.addColorStop(0,'#fff');side.addColorStop(.18,color);side.addColorStop(1,'#120018');rctx.shadowBlur=20;rctx.shadowColor=glow;rctx.fillStyle=side;rctx.beginPath();rctx.arc(x,y,r,0,Math.PI*2);rctx.fill();rctx.fillStyle='rgba(255,255,255,.35)';rctx.beginPath();rctx.arc(x-r*.35,y-r*.35,r*.32,0,Math.PI*2);rctx.fill();rctx.shadowBlur=0;rctx.font=`${r+8}px Arial`;rctx.textAlign='center';rctx.textBaseline='middle';rctx.fillText(emoji,x,y+1)}function drawRpg(){rctx.clearRect(0,0,rpg.width,rpg.height);let floor=rctx.createLinearGradient(0,0,0,rpg.height);floor.addColorStop(0,'#220036');floor.addColorStop(.45,'#12001f');floor.addColorStop(1,'#020006');rctx.fillStyle=floor;rctx.fillRect(0,0,rpg.width,rpg.height);let horizon=86,cx=rpg.width/2;rctx.strokeStyle='rgba(255,255,255,.08)';for(let i=-8;i<=8;i++){rctx.beginPath();rctx.moveTo(cx,horizon);rctx.lineTo(cx+i*92,rpg.height);rctx.stroke()}for(let y=horizon;y<rpg.height;y+=34){let depth=(y-horizon)/(rpg.height-horizon),cy=horizon+Math.pow(depth,1.8)*(rpg.height-horizon);rctx.beginPath();rctx.moveTo(0,cy);rctx.lineTo(rpg.width,cy);rctx.stroke()}rctx.shadowBlur=35;rctx.shadowColor='orange';rctx.fillStyle='rgba(255,100,0,.16)';rctx.beginPath();rctx.ellipse(rpgState.boss.x,rpgState.boss.y,80,36,0,0,Math.PI*2);rctx.fill();rctx.shadowBlur=0;rpgState.items.forEach(it=>draw3DToken(it.x,it.y,it.r+4,'gold','💎','gold'));rpgState.enemies.forEach(e=>{if(e.hp<=0)return;draw3DToken(e.x,e.y,e.r+2,e.type==='fire'?'orange':'#4cff6a',e.type==='fire'?'🔥':'💩',e.type==='fire'?'orange':'lime')});if(rpgState.boss.active&&rpgState.boss.hp>0){let b=rpgState.boss;draw3DToken(b.x,b.y,b.r+6,'#ff6a00','🐉','orange');rctx.fillStyle='rgba(0,0,0,.7)';rctx.fillRect(b.x-42,b.y-62,84,8);rctx.fillStyle='orange';rctx.fillRect(b.x-42,b.y-62,84*(b.hp/b.maxHp),8)}draw3DToken(rpgState.naomi.x,rpgState.naomi.y,rpgState.naomi.r+4,'violet','🌙','violet');if(rpgState.player.inv%6<3)draw3DToken(rpgState.player.x,rpgState.player.y,rpgState.player.r+5,'hotpink','👑','hotpink');rpgState.parts.forEach(pt=>{rctx.globalAlpha=pt.life/30;rctx.fillStyle=pt.color;rctx.shadowColor=pt.color;rctx.shadowBlur=14;rctx.beginPath();rctx.arc(pt.x,pt.y,4,0,Math.PI*2);rctx.fill()});rpgState.texts.forEach(t=>{rctx.globalAlpha=t.life/45;rctx.fillStyle=t.color;rctx.font='bold 18px Arial';rctx.textAlign='center';rctx.fillText(t.text,t.x,t.y)});rctx.globalAlpha=1;rctx.shadowBlur=0}
+/* Learning Cards */
+const learnCards=[
+  {symbol:'●',word:'CIRCLE',prompt:'Round like a ball.'},
+  {symbol:'■',word:'SQUARE',prompt:'Four equal sides.'},
+  {symbol:'▲',word:'TRIANGLE',prompt:'Three pointy corners.'},
+  {symbol:'★',word:'STAR',prompt:'Bright star shape.'},
+  {symbol:'♥',word:'HEART',prompt:'A heart means love.'},
+  {symbol:'☀',word:'SUN',prompt:'The sun shines bright.'},
+  {symbol:'☾',word:'MOON',prompt:'The moon glows at night.'},
+  {symbol:'⬆',word:'UP',prompt:'Point up high.'},
+  {symbol:'⬇',word:'DOWN',prompt:'Point down low.'},
+  {symbol:'1',word:'ONE',prompt:'One big symbol.'},
+  {symbol:'2',word:'TWO',prompt:'Two comes after one.'},
+  {symbol:'3',word:'THREE',prompt:'Three is a tiny crowd.'}
+];
+let learnIndex=0,learnDark=false,learnCompleted=0;
+function renderLearnCard(){const c=learnCards[learnIndex],card=document.getElementById('learnCard');if(!card)return;document.getElementById('learnSymbol').textContent=c.symbol;document.getElementById('learnWord').textContent=c.word;document.getElementById('learnPrompt').textContent=c.prompt;document.getElementById('learnProgressBar').style.width=((learnIndex+1)/learnCards.length*100)+'%';card.classList.toggle('dark',learnDark);card.classList.remove('soft-flash');card.offsetHeight;card.classList.add('soft-flash')}
+function nextLearnCard(){sfxCollect();learnIndex=(learnIndex+1)%learnCards.length;learnCompleted++;if(learnCompleted%learnCards.length===0){saveScore('learn','TWIN LEARNER',learnCompleted);confetti(50);sfxWin()}renderLearnCard()}
+function prevLearnCard(){sfxClick();learnIndex=(learnIndex-1+learnCards.length)%learnCards.length;renderLearnCard()}
+function toggleLearnContrast(){sfxClick();learnDark=!learnDark;renderLearnCard()}
+function repeatLearnCard(){sfxScore();const c=learnCards[learnIndex];document.getElementById('learnPrompt').textContent='Say it together: '+c.word+'!'}
+renderLearnCard();
 function mainLoop(){updatePong();drawPong();updateRpg();drawRpg();requestAnimationFrame(mainLoop)}renderAllLeaderboards();mainLoop();
 </script>
 </body>
