@@ -1,169 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <title>Twin Games Deluxe</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
   font-family: Arial, sans-serif;
-  text-align: center;
   color: white;
-  background:
-    radial-gradient(circle at top left, rgba(255,105,180,.35), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(160,80,255,.35), transparent 35%),
-    linear-gradient(135deg, #12001f, #000);
+  text-align: center;
+  background: #06000d;
 }
 
-body::before {
-  content: "";
+#bgCanvas {
   position: fixed;
   inset: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(white 1px, transparent 1px),
-    radial-gradient(hotpink 1px, transparent 1px),
-    radial-gradient(violet 1px, transparent 1px);
-  background-size: 45px 45px, 80px 80px, 120px 120px;
-  opacity: .22;
-  animation: stars 12s linear infinite;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
 }
 
-@keyframes stars {
-  from { transform: translateY(0); }
-  to { transform: translateY(-120px); }
+.overlay {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 105, 180, .22), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(160, 80, 255, .25), transparent 38%),
+    linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.55));
+  z-index: -1;
 }
 
 .screen {
   display: none;
-  padding: 20px;
-  animation: fadeIn .35s ease;
+  min-height: 100vh;
+  padding: 18px;
+  animation: screenIn .35s ease;
 }
 
-.active {
-  display: block;
-}
+.active { display: block; }
 
-@keyframes fadeIn {
+@keyframes screenIn {
   from { opacity: 0; transform: scale(.96); }
   to { opacity: 1; transform: scale(1); }
 }
 
 h1 {
-  font-size: 44px;
-  margin: 24px 0 8px;
-  background: linear-gradient(90deg, hotpink, gold, violet, cyan);
+  margin: 16px 0 6px;
+  font-size: clamp(36px, 10vw, 66px);
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #ff4fb8, #ffd700, #9b5cff, #00eaff);
+  background-size: 300%;
   -webkit-background-clip: text;
   color: transparent;
-  text-shadow: 0 0 25px rgba(255,105,180,.3);
+  animation: titleGlow 4s linear infinite;
+  text-shadow: 0 0 35px rgba(255,105,180,.35);
 }
 
-p {
+@keyframes titleGlow {
+  0% { background-position: 0%; }
+  100% { background-position: 300%; }
+}
+
+.subtitle {
   opacity: .9;
+  margin: 0 0 18px;
+  font-size: 16px;
+}
+
+.card {
+  width: min(94%, 520px);
+  margin: 14px auto;
+  padding: 22px;
+  border-radius: 30px;
+  background: rgba(255,255,255,.11);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow:
+    0 0 45px rgba(255,105,180,.22),
+    inset 0 0 30px rgba(255,255,255,.06);
+  backdrop-filter: blur(14px);
+}
+
+.character-row {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.character {
+  width: 145px;
+  padding: 12px;
+  border-radius: 24px;
+  background: rgba(0,0,0,.32);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 0 22px rgba(255,255,255,.12);
+  animation: floaty 3s ease-in-out infinite;
+}
+
+.character:nth-child(2) { animation-delay: .45s; }
+
+@keyframes floaty {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+
+.avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid gold;
+  box-shadow: 0 0 25px hotpink;
+}
+
+.character:nth-child(2) .avatar {
+  box-shadow: 0 0 25px violet;
+}
+
+.character-name {
+  font-weight: 900;
+  margin-top: 8px;
 }
 
 button {
-  margin: 10px;
-  padding: 14px 24px;
+  margin: 9px;
+  padding: 15px 24px;
   border: none;
   border-radius: 999px;
   font-size: 17px;
-  font-weight: bold;
-  background: linear-gradient(90deg, hotpink, gold, violet);
-  color: #190020;
+  font-weight: 900;
+  color: #18001f;
+  background: linear-gradient(90deg, #ff4fb8, #ffd700, #9b5cff);
+  box-shadow: 0 0 22px rgba(255,105,180,.45);
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(255,105,180,.5);
   transition: transform .12s, box-shadow .12s;
 }
 
 button:hover {
   transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 0 30px rgba(255,215,0,.7);
+  box-shadow: 0 0 34px rgba(255,215,0,.75);
 }
 
-button:active {
-  transform: scale(.95);
-}
-
-.card {
-  width: min(92%, 460px);
-  margin: 20px auto;
-  padding: 24px;
-  border-radius: 28px;
-  background: rgba(255,255,255,.12);
-  box-shadow:
-    0 0 35px rgba(255,105,180,.35),
-    inset 0 0 24px rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.25);
-  backdrop-filter: blur(12px);
-}
-
-.menu-img {
-  width: 118px;
-  height: 118px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 5px solid gold;
-  margin: 6px;
-  box-shadow: 0 0 25px hotpink;
-  animation: floaty 3s ease-in-out infinite;
-}
-
-.menu-img:nth-child(2) {
-  box-shadow: 0 0 25px violet;
-  animation-delay: .4s;
-}
-
-@keyframes floaty {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
+button:active { transform: scale(.94); }
 
 .score {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 900;
+  margin: 12px;
 }
 
-/* COIN GAME */
+.panel {
+  width: min(94%, 520px);
+  margin: 14px auto;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 0 20px rgba(255,255,255,.06);
+}
+
+/* Coin Game */
 .coin-container {
-  perspective: 1700px;
-  margin-top: 32px;
+  perspective: 1800px;
+  margin: 28px auto;
 }
 
 .coin {
-  width: 225px;
-  height: 225px;
+  width: 235px;
+  height: 235px;
   margin: auto;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 1.9s cubic-bezier(.15,.85,.25,1.15);
+  transition: transform 2s cubic-bezier(.15,.85,.25,1.15);
 }
 
 .coin.spinning {
-  filter: blur(1px) brightness(1.25);
+  filter: blur(1.2px) brightness(1.25);
 }
 
 .coin-edge {
   position: absolute;
-  inset: -12px;
+  inset: -14px;
   border-radius: 50%;
   background: repeating-conic-gradient(
-    #4b2f00 0deg 5deg,
-    #ffd700 5deg 10deg,
-    #fff1a8 10deg 14deg,
-    #9c6500 14deg 20deg
+    #402600 0deg 4deg,
+    #ffd700 4deg 9deg,
+    #fff3a0 9deg 13deg,
+    #8a5800 13deg 20deg
   );
   box-shadow:
-    0 0 45px rgba(255,215,0,.9),
-    inset 0 0 18px rgba(0,0,0,.5);
+    0 0 52px rgba(255,215,0,.95),
+    inset 0 0 22px rgba(0,0,0,.55);
 }
 
 .coin-face {
@@ -179,22 +212,18 @@ button:active {
 .coin-face::after {
   content: "";
   position: absolute;
-  inset: 12px;
+  inset: 14px;
   border-radius: 50%;
-  border: 3px double rgba(255,255,255,.8);
+  border: 4px double rgba(255,255,255,.85);
   pointer-events: none;
 }
 
 .juliette-glow {
-  box-shadow:
-    0 0 40px hotpink,
-    0 0 85px rgba(255,105,180,.95);
+  box-shadow: 0 0 45px hotpink, 0 0 95px rgba(255,105,180,.95);
 }
 
 .naomi-glow {
-  box-shadow:
-    0 0 40px violet,
-    0 0 85px rgba(180,90,255,.95);
+  box-shadow: 0 0 45px violet, 0 0 95px rgba(180,90,255,.95);
 }
 
 .coin-img {
@@ -205,85 +234,88 @@ button:active {
 
 .label {
   position: absolute;
-  bottom: 13px;
+  bottom: 14px;
   width: 100%;
   font-weight: 900;
   color: #fff8c7;
-  text-shadow: 0 2px 3px #000, 0 0 12px gold;
+  text-shadow: 0 2px 3px black, 0 0 14px gold;
   z-index: 3;
 }
 
-.description {
-  width: min(90%, 460px);
-  margin: 16px auto;
-  padding: 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,.13);
-  border: 1px solid rgba(255,255,255,.18);
-  box-shadow: inset 0 0 18px rgba(255,255,255,.08);
+/* Pong */
+#pong {
+  display: block;
+  margin: 14px auto;
+  width: min(95vw, 430px);
+  height: auto;
+  background: #05000a;
+  border-radius: 24px;
+  border: 4px solid gold;
+  box-shadow:
+    0 0 34px rgba(255,215,0,.65),
+    0 0 70px rgba(255,105,180,.25);
 }
 
-/* PONG */
-canvas {
-  display: block;
-  margin: 16px auto;
-  background:
-    radial-gradient(circle at center, rgba(255,255,255,.08), transparent 40%),
-    linear-gradient(180deg, #070011, #000);
-  border: 4px solid gold;
-  border-radius: 22px;
-  box-shadow:
-    0 0 28px rgba(255,215,0,.55),
-    0 0 60px rgba(255,105,180,.25);
-  max-width: 95vw;
+.shake {
+  animation: shake .18s linear;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
 }
 
 .confetti {
   position: fixed;
+  top: -12px;
   width: 9px;
-  height: 14px;
-  top: -10px;
-  animation: fall 2s linear forwards;
-  z-index: 999;
+  height: 15px;
+  z-index: 99;
+  animation: fall 2.2s linear forwards;
 }
 
 @keyframes fall {
-  to {
-    transform: translateY(110vh) rotate(720deg);
-    opacity: 0;
-  }
-}
-
-.music-status {
-  font-size: 14px;
-  opacity: .8;
-  margin-top: 8px;
+  to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
+<canvas id="bgCanvas"></canvas>
+<div class="overlay"></div>
 
+<!-- HOME -->
 <div id="home" class="screen active">
-  <h1>🎮 Twin Games Deluxe 🎮</h1>
-  <p>Juliette vs Naomi: premium baby chaos edition</p>
+  <h1>Twin Games Deluxe</h1>
+  <p class="subtitle">Juliette vs Naomi: premium baby chaos arcade</p>
 
   <div class="card">
-    <img src="juliette.jpg?v=100" class="menu-img" alt="Juliette">
-    <img src="naomi.jpg?v=100" class="menu-img" alt="Naomi">
+    <div class="character-row">
+      <div class="character">
+        <img src="juliette.jpg?v=200" class="avatar" alt="Juliette">
+        <div class="character-name">👑 Juliette</div>
+        <small>Duchess Doo Doo</small>
+      </div>
 
-    <h2>Choose Your Game</h2>
+      <div class="character">
+        <img src="naomi.jpg?v=200" class="avatar" alt="Naomi">
+        <div class="character-name">🌙 Naomi</div>
+        <small>Wide-Eyed Wildcard</small>
+      </div>
+    </div>
 
     <button onclick="goScreen('coinGame')">🪙 Flip for a Twin</button>
-    <button onclick="goScreen('pongGame')">🏓 Twin Pong</button>
-    <button onclick="toggleMusic()">🎵 Music On / Off</button>
-
-    <div id="musicStatus" class="music-status">Music: Off</div>
+    <button onclick="goScreen('pongGame')">🏓 Twin Pong Deluxe</button>
+    <button onclick="toggleMusic()">🎵 Music: <span id="musicText">Off</span></button>
   </div>
 </div>
 
+<!-- COIN GAME -->
 <div id="coinGame" class="screen">
-  <h1>🪙 Flip for a Twin</h1>
+  <h1>Flip for a Twin</h1>
 
   <div class="score">
     Juliette: <span id="coinJScore">0</span> |
@@ -295,12 +327,12 @@ canvas {
       <div class="coin-edge"></div>
 
       <div id="julietteFace" class="coin-face juliette-glow">
-        <img src="juliette.jpg?v=100" class="coin-img" alt="Juliette">
+        <img src="juliette.jpg?v=200" class="coin-img" alt="Juliette">
         <div class="label">Juliette</div>
       </div>
 
       <div id="naomiFace" class="coin-face naomi-glow">
-        <img src="naomi.jpg?v=100" class="coin-img" alt="Naomi">
+        <img src="naomi.jpg?v=200" class="coin-img" alt="Naomi">
         <div class="label">Naomi</div>
       </div>
     </div>
@@ -310,21 +342,22 @@ canvas {
   <button onclick="resetCoin()">RESET</button>
   <button onclick="goScreen('home')">⬅ MENU</button>
 
-  <div id="coinResult" class="description">Tap flip to let the twin council decide.</div>
+  <div id="coinResult" class="panel">Tap flip to let the twin council decide.</div>
 </div>
 
+<!-- PONG GAME -->
 <div id="pongGame" class="screen">
-  <h1>🏓 Twin Pong</h1>
+  <h1>Twin Pong Deluxe</h1>
 
   <div class="score">
     👑 Juliette: <span id="pongJScore">0</span> |
     🌙 Naomi: <span id="pongNScore">0</span>
   </div>
 
-  <canvas id="pong" width="370" height="520"></canvas>
+  <canvas id="pong" width="430" height="560"></canvas>
 
-  <div id="pongMessage" class="description">
-    Move your finger or mouse to control Juliette. First to 5 wins.
+  <div id="pongMessage" class="panel">
+    Move your finger or mouse to control Juliette. First to 7 wins.
   </div>
 
   <button onclick="resetPong()">RESET</button>
@@ -332,169 +365,140 @@ canvas {
 </div>
 
 <script>
-/* =========================================================
-   AUDIO ENGINE - generated seamless loops and sound effects
-   ========================================================= */
+/* Background Visualizer */
+const bg = document.getElementById("bgCanvas");
+const bgCtx = bg.getContext("2d");
+let stars = [];
 
+function resizeBg() {
+  bg.width = window.innerWidth;
+  bg.height = window.innerHeight;
+  stars = Array.from({length: 85}, () => ({
+    x: Math.random() * bg.width,
+    y: Math.random() * bg.height,
+    r: Math.random() * 2 + .5,
+    vx: (Math.random() - .5) * .35,
+    vy: Math.random() * .45 + .15,
+    hue: Math.random() < .5 ? 320 : 275
+  }));
+}
+
+window.addEventListener("resize", resizeBg);
+resizeBg();
+
+function drawBg() {
+  bgCtx.clearRect(0,0,bg.width,bg.height);
+
+  const grad = bgCtx.createRadialGradient(bg.width/2, bg.height/2, 10, bg.width/2, bg.height/2, bg.width);
+  grad.addColorStop(0, "#22002f");
+  grad.addColorStop(1, "#020006");
+  bgCtx.fillStyle = grad;
+  bgCtx.fillRect(0,0,bg.width,bg.height);
+
+  stars.forEach(s => {
+    s.x += s.vx;
+    s.y += s.vy;
+    if (s.y > bg.height) s.y = -5;
+    if (s.x < 0) s.x = bg.width;
+    if (s.x > bg.width) s.x = 0;
+
+    bgCtx.beginPath();
+    bgCtx.fillStyle = `hsla(${s.hue}, 100%, 75%, .75)`;
+    bgCtx.shadowColor = `hsl(${s.hue}, 100%, 70%)`;
+    bgCtx.shadowBlur = 12;
+    bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    bgCtx.fill();
+  });
+
+  bgCtx.shadowBlur = 0;
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+/* Audio Engine */
 let audioCtx;
 let musicOn = false;
-let activeMusicNodes = [];
-let currentMusic = "menu";
+let musicTimer = null;
+let currentScreen = "home";
 
 function initAudio() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
 }
 
-function masterGain(value = .18) {
-  const gain = audioCtx.createGain();
-  gain.gain.value = value;
-  gain.connect(audioCtx.destination);
-  return gain;
-}
-
-function stopMusic() {
-  activeMusicNodes.forEach(node => {
-    try { node.stop(); } catch(e) {}
-    try { node.disconnect(); } catch(e) {}
-  });
-  activeMusicNodes = [];
-}
-
-function playLoop(type) {
-  if (!musicOn || !audioCtx) return;
-
-  stopMusic();
-
-  const now = audioCtx.currentTime;
-  const out = masterGain(type === "pong" ? .16 : .12);
-
-  const notes = type === "pong"
-    ? [55, 65.41, 73.42, 82.41]
-    : [261.63, 329.63, 392.00, 523.25];
-
-  const tempo = type === "pong" ? .22 : .55;
-
-  notes.forEach((freq, i) => {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-
-    osc.type = type === "pong" ? "sawtooth" : "triangle";
-    osc.frequency.value = freq;
-
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(type === "pong" ? .045 : .035, now + .05);
-
-    osc.connect(gain);
-    gain.connect(out);
-
-    osc.start(now + i * tempo);
-
-    const interval = setInterval(() => {
-      if (!musicOn || currentMusic !== type) {
-        clearInterval(interval);
-        return;
-      }
-
-      const t = audioCtx.currentTime;
-      gain.gain.cancelScheduledValues(t);
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(type === "pong" ? .055 : .04, t + .03);
-      gain.gain.exponentialRampToValueAtTime(.001, t + tempo * .85);
-
-      osc.frequency.setValueAtTime(notes[i % notes.length], t);
-    }, tempo * notes.length * 1000);
-
-    activeMusicNodes.push(osc);
-  });
-
-  const bass = audioCtx.createOscillator();
-  const bassGain = audioCtx.createGain();
-  bass.type = type === "pong" ? "square" : "sine";
-  bass.frequency.value = type === "pong" ? 55 : 130.81;
-  bassGain.gain.value = type === "pong" ? .04 : .025;
-  bass.connect(bassGain);
-  bassGain.connect(out);
-  bass.start();
-  activeMusicNodes.push(bass);
-}
-
-function toggleMusic() {
+function tone(freq, duration=.12, type="sine", vol=.08) {
   initAudio();
-  musicOn = !musicOn;
-  document.getElementById("musicStatus").textContent = musicOn ? "Music: On" : "Music: Off";
-
-  if (musicOn) {
-    playLoop(currentMusic);
-  } else {
-    stopMusic();
-  }
-
-  sfxClick();
-}
-
-function switchMusic(type) {
-  currentMusic = type;
-  if (musicOn) {
-    playLoop(type);
-  }
-}
-
-function tone(freq, duration, type, volume) {
-  initAudio();
-
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
-
   osc.type = type;
   osc.frequency.value = freq;
-
-  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
   gain.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + duration);
-
   osc.connect(gain);
   gain.connect(audioCtx.destination);
-
   osc.start();
   osc.stop(audioCtx.currentTime + duration);
 }
 
 function sfxClick() {
-  tone(600, .06, "square", .08);
-  setTimeout(() => tone(900, .05, "triangle", .06), 45);
+  tone(700,.05,"square",.06);
+  setTimeout(()=>tone(1100,.06,"triangle",.05),45);
 }
 
 function sfxHit() {
-  tone(300, .05, "square", .08);
-  setTimeout(() => tone(180, .04, "sine", .05), 35);
+  tone(190,.04,"square",.08);
+  setTimeout(()=>tone(320,.05,"triangle",.06),35);
 }
 
 function sfxScore() {
-  tone(523, .08, "triangle", .08);
-  setTimeout(() => tone(659, .08, "triangle", .08), 80);
-  setTimeout(() => tone(784, .11, "triangle", .08), 160);
+  tone(523,.08,"triangle",.08);
+  setTimeout(()=>tone(659,.08,"triangle",.08),80);
+  setTimeout(()=>tone(880,.13,"triangle",.08),160);
 }
 
-function sfxBabyWin() {
-  tone(700, .08, "triangle", .08);
-  setTimeout(() => tone(950, .1, "triangle", .08), 80);
-  setTimeout(() => tone(1200, .16, "sine", .07), 170);
+function sfxWin() {
+  tone(700,.08,"triangle",.08);
+  setTimeout(()=>tone(950,.1,"triangle",.08),90);
+  setTimeout(()=>tone(1250,.18,"sine",.07),190);
 }
 
-function sfxCoinFlip() {
-  for (let i = 0; i < 10; i++) {
-    setTimeout(() => tone(280 + i * 55, .035, "square", .04), i * 70);
+function sfxCoin() {
+  for (let i = 0; i < 14; i++) {
+    setTimeout(()=>tone(250 + i * 42, .035, "square", .045), i * 55);
   }
 }
 
-/* =========================================================
-   GLOBAL NAV
-   ========================================================= */
+function playMusicPattern() {
+  if (!musicOn) return;
 
+  const menuNotes = [261, 329, 392, 523, 392, 329];
+  const pongNotes = [110, 123, 147, 165, 196, 165, 147, 123];
+
+  let notes = currentScreen === "pongGame" ? pongNotes : menuNotes;
+  let speed = currentScreen === "pongGame" ? 130 : 260;
+  let type = currentScreen === "pongGame" ? "sawtooth" : "triangle";
+  let i = 0;
+
+  clearInterval(musicTimer);
+  musicTimer = setInterval(() => {
+    if (!musicOn) return;
+    tone(notes[i % notes.length], currentScreen === "pongGame" ? .11 : .2, type, currentScreen === "pongGame" ? .035 : .028);
+    if (currentScreen === "pongGame" && i % 2 === 0) tone(55, .08, "square", .025);
+    i++;
+  }, speed);
+}
+
+function toggleMusic() {
+  initAudio();
+  musicOn = !musicOn;
+  document.getElementById("musicText").textContent = musicOn ? "On" : "Off";
+  sfxClick();
+
+  if (musicOn) playMusicPattern();
+  else clearInterval(musicTimer);
+}
+
+/* Navigation */
 function goScreen(id) {
   initAudio();
   sfxClick();
@@ -502,28 +506,25 @@ function goScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 
-  if (id === "pongGame") switchMusic("pong");
-  else switchMusic("menu");
+  currentScreen = id;
+  if (musicOn) playMusicPattern();
 }
 
-function confetti() {
-  const colors = ["gold","hotpink","cyan","white","violet"];
-
-  for(let i = 0; i < 70; i++) {
-    const c = document.createElement("div");
-    c.className = "confetti";
-    c.style.left = Math.random() * 100 + "vw";
-    c.style.background = colors[Math.floor(Math.random() * colors.length)];
-    c.style.animationDelay = Math.random() * .45 + "s";
+/* Confetti */
+function confetti(amount=80) {
+  const colors = ["gold","hotpink","cyan","white","violet","#ff4fb8"];
+  for(let i=0;i<amount;i++) {
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay=Math.random()*0.4+"s";
     document.body.appendChild(c);
-    setTimeout(() => c.remove(), 2400);
+    setTimeout(()=>c.remove(),2400);
   }
 }
 
-/* =========================================================
-   COIN GAME
-   ========================================================= */
-
+/* Coin Game */
 let coinJ = 0;
 let coinN = 0;
 let coinFlipping = false;
@@ -532,36 +533,31 @@ function showFace(winner) {
   document.getElementById("julietteFace").style.display = winner === "Juliette" ? "block" : "none";
   document.getElementById("naomiFace").style.display = winner === "Naomi" ? "block" : "none";
 }
-
 showFace("Juliette");
 
 function flipCoin() {
   initAudio();
-
   if (coinFlipping) return;
-  coinFlipping = true;
 
+  coinFlipping = true;
   const winner = Math.random() < .5 ? "Juliette" : "Naomi";
   const coin = document.getElementById("coin");
   const result = document.getElementById("coinResult");
 
   result.textContent = "The coin is spinning dramatically...";
   coin.classList.add("spinning");
-
-  sfxCoinFlip();
-  navigator.vibrate?.(120);
+  sfxCoin();
 
   coin.style.transition = "none";
-  coin.style.transform = "rotateY(0deg)";
+  coin.style.transform = "rotateY(0deg) rotateX(0deg)";
   coin.offsetHeight;
 
-  coin.style.transition = "transform 1.9s cubic-bezier(.15,.85,.25,1.15)";
-  coin.style.transform = "rotateY(3420deg) rotateX(18deg)";
+  coin.style.transition = "transform 2s cubic-bezier(.15,.85,.25,1.15)";
+  coin.style.transform = "rotateY(3960deg) rotateX(22deg)";
 
   setTimeout(() => {
     showFace(winner);
     coin.classList.remove("spinning");
-    sfxBabyWin();
 
     if (winner === "Juliette") {
       coinJ++;
@@ -573,113 +569,159 @@ function flipCoin() {
       result.textContent = "🌙 Naomi wins! The wide-eyed wildcard strikes again.";
     }
 
-    confetti();
-    navigator.vibrate?.([80, 50, 80]);
+    sfxWin();
+    confetti(90);
     coinFlipping = false;
-  }, 1900);
+  }, 2000);
 }
 
 function resetCoin() {
-  sfxClick();
   coinJ = 0;
   coinN = 0;
-
   document.getElementById("coinJScore").textContent = 0;
   document.getElementById("coinNScore").textContent = 0;
   document.getElementById("coinResult").textContent = "Scores reset. The twin council awaits.";
-
   showFace("Juliette");
+  sfxClick();
 }
 
-/* =========================================================
-   PONG GAME
-   ========================================================= */
-
+/* Pong Deluxe */
 const canvas = document.getElementById("pong");
 const ctx = canvas.getContext("2d");
 
-let pj = 0;
-let pn = 0;
-let paddleW = 13;
-let paddleH = 86;
-let julietteY = 215;
-let naomiY = 215;
+let pj = 0, pn = 0;
+let paddleW = 14, paddleH = 92;
+let julietteY = 230, naomiY = 230;
 let pongOver = false;
 let particles = [];
+let trail = [];
+let shakeFrames = 0;
 
 let ball = {
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  vx: 4.3,
+  x: canvas.width/2,
+  y: canvas.height/2,
+  vx: 4.6,
   vy: 3.2,
   size: 10
 };
 
 function moveJuliette(clientY) {
   const rect = canvas.getBoundingClientRect();
-  julietteY = clientY - rect.top - paddleH / 2;
+  julietteY = clientY - rect.top - paddleH/2;
   julietteY = Math.max(0, Math.min(canvas.height - paddleH, julietteY));
 }
 
 canvas.addEventListener("mousemove", e => moveJuliette(e.clientY));
-
 canvas.addEventListener("touchmove", e => {
   e.preventDefault();
   moveJuliette(e.touches[0].clientY);
-}, { passive: false });
+}, { passive:false });
 
-function addParticles(x, y, color) {
-  for (let i = 0; i < 12; i++) {
+function addParticles(x,y,color,count=16) {
+  for(let i=0;i<count;i++) {
     particles.push({
-      x,
-      y,
-      vx: (Math.random() - .5) * 5,
-      vy: (Math.random() - .5) * 5,
-      life: 28,
+      x,y,
+      vx:(Math.random()-.5)*6,
+      vy:(Math.random()-.5)*6,
+      life:34,
       color
     });
   }
 }
 
-function drawPong() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+function resetBall(direction = 1) {
+  ball.x = canvas.width/2;
+  ball.y = canvas.height/2;
+  ball.vx = 4.6 * direction;
+  ball.vy = (Math.random()*5)-2.5;
+  trail = [];
+}
 
-  const grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 10, canvas.width/2, canvas.height/2, 280);
-  grd.addColorStop(0, "rgba(255,105,180,.16)");
+function drawArena() {
+  const grd = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 20, canvas.width/2, canvas.height/2, 360);
+  grd.addColorStop(0, "rgba(255,105,180,.18)");
+  grd.addColorStop(.55, "rgba(95,0,140,.18)");
   grd.addColorStop(1, "rgba(0,0,0,1)");
   ctx.fillStyle = grd;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  ctx.fillStyle = "rgba(255,255,255,.22)";
-  for(let y = 0; y < canvas.height; y += 26) {
-    ctx.fillRect(canvas.width/2 - 1, y, 2, 13);
+  ctx.strokeStyle = "rgba(255,255,255,.08)";
+  ctx.lineWidth = 1;
+
+  for(let y=0; y<canvas.height; y+=28) {
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(canvas.width,y);
+    ctx.stroke();
   }
 
-  ctx.shadowBlur = 18;
+  for(let x=0; x<canvas.width; x+=28) {
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,canvas.height);
+    ctx.stroke();
+  }
 
+  ctx.fillStyle = "rgba(255,255,255,.25)";
+  for(let y=0; y<canvas.height; y+=28) {
+    ctx.fillRect(canvas.width/2-1, y, 2, 14);
+  }
+}
+
+function drawPong() {
+  if (shakeFrames > 0) {
+    canvas.classList.add("shake");
+    shakeFrames--;
+  } else {
+    canvas.classList.remove("shake");
+  }
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawArena();
+
+  trail.forEach((t, i) => {
+    ctx.globalAlpha = i / trail.length;
+    ctx.fillStyle = "gold";
+    ctx.shadowColor = "gold";
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.arc(t.x,t.y,ball.size*(i/trail.length),0,Math.PI*2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  ctx.shadowBlur = 22;
   ctx.shadowColor = "hotpink";
   ctx.fillStyle = "hotpink";
-  ctx.fillRect(10, julietteY, paddleW, paddleH);
+  roundRect(12, julietteY, paddleW, paddleH, 8);
 
   ctx.shadowColor = "violet";
   ctx.fillStyle = "violet";
-  ctx.fillRect(canvas.width - 23, naomiY, paddleW, paddleH);
+  roundRect(canvas.width-26, naomiY, paddleW, paddleH, 8);
 
   particles.forEach(p => {
-    ctx.shadowColor = p.color;
+    ctx.globalAlpha = p.life/34;
     ctx.fillStyle = p.color;
-    ctx.globalAlpha = p.life / 28;
-    ctx.fillRect(p.x, p.y, 4, 4);
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 14;
+    ctx.fillRect(p.x,p.y,5,5);
   });
   ctx.globalAlpha = 1;
 
   ctx.shadowColor = "gold";
+  ctx.shadowBlur = 25;
   ctx.fillStyle = "white";
   ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI * 2);
+  ctx.arc(ball.x,ball.y,ball.size,0,Math.PI*2);
   ctx.fill();
 
   ctx.shadowBlur = 0;
+}
+
+function roundRect(x,y,w,h,r) {
+  ctx.beginPath();
+  ctx.roundRect(x,y,w,h,r);
+  ctx.fill();
 }
 
 function updatePong() {
@@ -687,6 +729,9 @@ function updatePong() {
 
   ball.x += ball.vx;
   ball.y += ball.vy;
+
+  trail.push({x:ball.x,y:ball.y});
+  if(trail.length > 16) trail.shift();
 
   particles.forEach(p => {
     p.x += p.vx;
@@ -698,89 +743,74 @@ function updatePong() {
   if(ball.y < ball.size || ball.y > canvas.height - ball.size) {
     ball.vy *= -1;
     sfxHit();
-    addParticles(ball.x, ball.y, "cyan");
+    addParticles(ball.x,ball.y,"cyan",10);
+    shakeFrames = 3;
   }
 
-  naomiY += ((ball.y - paddleH / 2) - naomiY) * 0.08;
+  const aiSpeed = 0.085 + Math.min((pj+pn)*0.006, .05);
+  naomiY += ((ball.y - paddleH/2) - naomiY) * aiSpeed;
   naomiY = Math.max(0, Math.min(canvas.height - paddleH, naomiY));
 
-  if(ball.x - ball.size < 25 &&
-     ball.y > julietteY &&
-     ball.y < julietteY + paddleH) {
-    ball.vx = Math.abs(ball.vx) + .22;
-    ball.vy += (ball.y - (julietteY + paddleH/2)) * .045;
+  if(ball.x-ball.size < 28 && ball.y > julietteY && ball.y < julietteY+paddleH && ball.vx < 0) {
+    ball.vx = Math.abs(ball.vx) + .24;
+    ball.vy += (ball.y - (julietteY+paddleH/2)) * .05;
     sfxHit();
-    addParticles(ball.x, ball.y, "hotpink");
+    addParticles(ball.x,ball.y,"hotpink",18);
+    shakeFrames = 4;
   }
 
-  if(ball.x + ball.size > canvas.width - 25 &&
-     ball.y > naomiY &&
-     ball.y < naomiY + paddleH) {
-    ball.vx = -Math.abs(ball.vx) - .22;
-    ball.vy += (ball.y - (naomiY + paddleH/2)) * .045;
+  if(ball.x+ball.size > canvas.width-28 && ball.y > naomiY && ball.y < naomiY+paddleH && ball.vx > 0) {
+    ball.vx = -Math.abs(ball.vx) - .24;
+    ball.vy += (ball.y - (naomiY+paddleH/2)) * .05;
     sfxHit();
-    addParticles(ball.x, ball.y, "violet");
+    addParticles(ball.x,ball.y,"violet",18);
+    shakeFrames = 4;
   }
 
-  if(ball.x < -24) {
+  if(ball.x < -25) {
     pn++;
-    scorePong();
+    document.getElementById("pongNScore").textContent = pn;
+    sfxScore();
+    addParticles(canvas.width/2, canvas.height/2, "violet",35);
+    resetBall(1);
   }
 
-  if(ball.x > canvas.width + 24) {
+  if(ball.x > canvas.width + 25) {
     pj++;
-    scorePong();
+    document.getElementById("pongJScore").textContent = pj;
+    sfxScore();
+    addParticles(canvas.width/2, canvas.height/2, "hotpink",35);
+    resetBall(-1);
   }
 
-  document.getElementById("pongJScore").textContent = pj;
-  document.getElementById("pongNScore").textContent = pn;
-
-  if(pj >= 5) endPong("👑 Juliette wins! Duchess Doo Doo dominates the court.");
-  if(pn >= 5) endPong("🌙 Naomi wins! The mysterious baby AI cannot be stopped.");
-}
-
-function scorePong() {
-  sfxScore();
-  navigator.vibrate?.(80);
-
-  ball.x = canvas.width / 2;
-  ball.y = canvas.height / 2;
-  ball.vx = ball.vx > 0 ? -4.3 : 4.3;
-  ball.vy = (Math.random() * 4) - 2;
+  if(pj >= 7) endPong("👑 Juliette wins! Duchess Doo Doo dominates the deluxe arena.");
+  if(pn >= 7) endPong("🌙 Naomi wins! The wide-eyed wildcard becomes pong champion.");
 }
 
 function endPong(msg) {
   pongOver = true;
   document.getElementById("pongMessage").textContent = msg;
-  sfxBabyWin();
-  confetti();
+  sfxWin();
+  confetti(120);
 }
 
 function resetPong() {
-  sfxClick();
-
-  pj = 0;
-  pn = 0;
-  pongOver = false;
-  julietteY = 215;
-  naomiY = 215;
-  particles = [];
-
+  pj=0; pn=0; pongOver=false;
+  julietteY=230; naomiY=230;
+  particles=[]; trail=[];
   document.getElementById("pongJScore").textContent = 0;
   document.getElementById("pongNScore").textContent = 0;
-  document.getElementById("pongMessage").textContent = "Move your finger or mouse to control Juliette. First to 5 wins.";
-
-  scorePong();
+  document.getElementById("pongMessage").textContent = "Move your finger or mouse to control Juliette. First to 7 wins.";
+  resetBall(Math.random() < .5 ? 1 : -1);
+  sfxClick();
 }
 
-function gameLoop() {
+function loop() {
   updatePong();
   drawPong();
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(loop);
 }
-
-gameLoop();
+loop();
 </script>
-
 </body>
 </html>
