@@ -3,198 +3,495 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Twin Pong</title>
+<title>Twin Games</title>
 
 <style>
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  background: radial-gradient(circle, #1a001f, #000);
-  color: white;
-  font-family: Arial;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
   text-align: center;
+  color: white;
+  background:
+    radial-gradient(circle at top, rgba(255,105,180,.35), transparent 35%),
+    radial-gradient(circle at bottom, rgba(160,80,255,.25), transparent 35%),
+    linear-gradient(135deg, #15001f, #000);
 }
 
+.screen { display: none; padding: 20px; }
+.active { display: block; }
+
 h1 {
-  margin: 10px;
-  background: linear-gradient(90deg, hotpink, violet);
+  font-size: 42px;
+  background: linear-gradient(90deg, hotpink, gold, violet, cyan);
   -webkit-background-clip: text;
   color: transparent;
 }
 
-canvas {
-  display: block;
-  margin: auto;
-  background: black;
-  border: 3px solid gold;
-  border-radius: 10px;
+button {
+  margin: 10px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: bold;
+  background: linear-gradient(90deg, hotpink, gold, violet);
+  color: #190020;
+  cursor: pointer;
+}
+
+.card {
+  width: min(92%, 430px);
+  margin: 18px auto;
+  padding: 20px;
+  border-radius: 24px;
+  background: rgba(255,255,255,.12);
+  box-shadow: 0 0 25px rgba(255,105,180,.35);
+}
+
+.menu-img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 5px solid gold;
+  box-shadow: 0 0 22px hotpink;
 }
 
 .score {
-  font-size: 22px;
-  margin: 10px;
+  font-size: 20px;
+  font-weight: bold;
 }
 
-button {
-  margin: 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  background: linear-gradient(90deg, hotpink, violet);
-  color: black;
-  font-weight: bold;
+/* COIN GAME */
+.coin-container {
+  perspective: 1600px;
+  margin-top: 30px;
+}
+
+.coin {
+  width: 215px;
+  height: 215px;
+  margin: auto;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 1.8s ease-out;
+}
+
+.coin.spinning {
+  filter: blur(1px) brightness(1.2);
+}
+
+.coin-edge {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    #5c3900 0deg 5deg,
+    #ffd700 5deg 10deg,
+    #fff1a8 10deg 14deg,
+    #9c6500 14deg 20deg
+  );
+  box-shadow: 0 0 38px rgba(255,215,0,.8);
+}
+
+.coin-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 9px solid #d4af37;
+  z-index: 2;
+}
+
+.juliette-glow {
+  box-shadow: 0 0 38px hotpink, 0 0 75px rgba(255,105,180,.9);
+}
+
+.naomi-glow {
+  box-shadow: 0 0 38px violet, 0 0 75px rgba(180,90,255,.9);
+}
+
+.coin-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.label {
+  position: absolute;
+  bottom: 12px;
+  width: 100%;
+  font-weight: 900;
+  color: #fff8c7;
+  text-shadow: 0 2px 3px #000, 0 0 10px gold;
+}
+
+/* PONG */
+canvas {
+  display: block;
+  margin: 15px auto;
+  background: black;
+  border: 4px solid gold;
+  border-radius: 18px;
+  box-shadow: 0 0 28px rgba(255,215,0,.5);
+  max-width: 95vw;
+}
+
+.description {
+  width: min(90%, 430px);
+  margin: 14px auto;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.12);
+}
+
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 12px;
+  top: -10px;
+  animation: fall 2s linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<h1>🏓 Twin Pong 🏓</h1>
+<!-- HOME -->
+<div id="home" class="screen active">
+  <h1>🎮 Twin Games 🎮</h1>
+  <p>Juliette vs Naomi: baby chaos edition</p>
 
-<div class="score">
-👑 Juliette: <span id="jScore">0</span> |
-🌙 Naomi: <span id="nScore">0</span>
+  <div class="card">
+    <img src="juliette.jpg?v=50" class="menu-img">
+    <img src="naomi.jpg?v=50" class="menu-img">
+    <h2>Choose Your Game</h2>
+    <button onclick="goScreen('coinGame')">🪙 Flip for a Twin</button>
+    <button onclick="goScreen('pongGame')">🏓 Twin Pong</button>
+    <button onclick="toggleMusic()">🎵 Toggle Music</button>
+  </div>
 </div>
 
-<canvas id="game" width="350" height="500"></canvas>
+<!-- COIN GAME -->
+<div id="coinGame" class="screen">
+  <h1>🪙 Flip for a Twin</h1>
 
-<div id="message"></div>
-<button onclick="resetGame()">RESET</button>
+  <div class="score">
+    Juliette: <span id="coinJScore">0</span> |
+    Naomi: <span id="coinNScore">0</span>
+  </div>
+
+  <div class="coin-container">
+    <div id="coin" class="coin">
+      <div class="coin-edge"></div>
+
+      <div id="julietteFace" class="coin-face juliette-glow">
+        <img src="juliette.jpg?v=50" class="coin-img">
+        <div class="label">Juliette</div>
+      </div>
+
+      <div id="naomiFace" class="coin-face naomi-glow">
+        <img src="naomi.jpg?v=50" class="coin-img">
+        <div class="label">Naomi</div>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="flipCoin()">FLIP</button>
+  <button onclick="resetCoin()">RESET</button>
+  <button onclick="goScreen('home')">⬅ MENU</button>
+
+  <div id="coinResult" class="description">Tap flip to let the twin council decide.</div>
+</div>
+
+<!-- PONG GAME -->
+<div id="pongGame" class="screen">
+  <h1>🏓 Twin Pong</h1>
+
+  <div class="score">
+    👑 Juliette: <span id="pongJScore">0</span> |
+    🌙 Naomi: <span id="pongNScore">0</span>
+  </div>
+
+  <canvas id="pong" width="360" height="500"></canvas>
+
+  <div id="pongMessage" class="description">
+    Move your finger/mouse to control Juliette. First to 5 wins.
+  </div>
+
+  <button onclick="resetPong()">RESET</button>
+  <button onclick="goScreen('home')">⬅ MENU</button>
+</div>
+
+<audio id="clickSound">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3">
+</audio>
+
+<audio id="dramaticSound">
+  <source src="https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3">
+</audio>
+
+<audio id="babySound">
+  <source src="https://assets.mixkit.co/active_storage/sfx/1658/1658-preview.mp3">
+</audio>
+
+<audio id="hitSound">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3">
+</audio>
+
+<audio id="scoreSound">
+  <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3">
+</audio>
+
+<audio id="bgMusic" loop>
+  <source src="https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3">
+</audio>
 
 <script>
-const canvas = document.getElementById("game");
+/* GLOBAL */
+let musicOn = false;
+
+function sound(id) {
+  try {
+    const s = document.getElementById(id);
+    s.currentTime = 0;
+    s.play();
+  } catch(e) {}
+}
+
+function goScreen(id) {
+  sound("clickSound");
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function toggleMusic() {
+  const m = document.getElementById("bgMusic");
+  musicOn = !musicOn;
+  musicOn ? m.play() : m.pause();
+}
+
+function confetti() {
+  const colors = ["gold","hotpink","cyan","white","violet"];
+  for(let i=0;i<45;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),2200);
+  }
+}
+
+/* COIN GAME */
+let coinJ = 0;
+let coinN = 0;
+let coinFlipping = false;
+
+function showFace(winner) {
+  document.getElementById("julietteFace").style.display = winner === "Juliette" ? "block" : "none";
+  document.getElementById("naomiFace").style.display = winner === "Naomi" ? "block" : "none";
+}
+
+showFace("Juliette");
+
+function flipCoin() {
+  if (coinFlipping) return;
+  coinFlipping = true;
+
+  const winner = Math.random() < .5 ? "Juliette" : "Naomi";
+  const coin = document.getElementById("coin");
+  const result = document.getElementById("coinResult");
+
+  result.textContent = "The coin is spinning dramatically...";
+  coin.classList.add("spinning");
+
+  sound("dramaticSound");
+  navigator.vibrate?.(120);
+
+  coin.style.transition = "none";
+  coin.style.transform = "rotateY(0deg)";
+  coin.offsetHeight;
+
+  coin.style.transition = "transform 1.8s ease-out";
+  coin.style.transform = "rotateY(3240deg) rotateX(18deg)";
+
+  setTimeout(() => {
+    showFace(winner);
+    coin.classList.remove("spinning");
+    sound("babySound");
+
+    if (winner === "Juliette") {
+      coinJ++;
+      document.getElementById("coinJScore").textContent = coinJ;
+      result.textContent = "👑 Juliette wins! Duchess Doo Doo has spoken.";
+    } else {
+      coinN++;
+      document.getElementById("coinNScore").textContent = coinN;
+      result.textContent = "🌙 Naomi wins! The wide-eyed wildcard strikes again.";
+    }
+
+    confetti();
+    coinFlipping = false;
+  }, 1800);
+}
+
+function resetCoin() {
+  coinJ = 0;
+  coinN = 0;
+  document.getElementById("coinJScore").textContent = 0;
+  document.getElementById("coinNScore").textContent = 0;
+  document.getElementById("coinResult").textContent = "Scores reset. The twin council awaits.";
+  showFace("Juliette");
+}
+
+/* PONG GAME */
+const canvas = document.getElementById("pong");
 const ctx = canvas.getContext("2d");
 
-let jScore = 0;
-let nScore = 0;
-
-const paddleWidth = 12;
-const paddleHeight = 80;
-
-let julietteY = 200;
-let naomiY = 200;
+let pj = 0;
+let pn = 0;
+let paddleW = 12;
+let paddleH = 80;
+let julietteY = 210;
+let naomiY = 210;
+let pongOver = false;
 
 let ball = {
   x: canvas.width / 2,
   y: canvas.height / 2,
   vx: 4,
   vy: 3,
-  size: 10
+  size: 11
 };
 
-let gameOver = false;
-
-/* CONTROLS */
-document.addEventListener("mousemove", e => {
+function moveJuliette(clientY) {
   const rect = canvas.getBoundingClientRect();
-  julietteY = e.clientY - rect.top - paddleHeight/2;
-});
-
-/* MOBILE TOUCH */
-canvas.addEventListener("touchmove", e => {
-  const rect = canvas.getBoundingClientRect();
-  julietteY = e.touches[0].clientY - rect.top - paddleHeight/2;
-});
-
-/* DRAW */
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  // Ball
-  ctx.fillStyle = "white";
-  ctx.fillRect(ball.x, ball.y, ball.size, ball.size);
-
-  // Juliette paddle (pink)
-  ctx.fillStyle = "hotpink";
-  ctx.fillRect(10, julietteY, paddleWidth, paddleHeight);
-
-  // Naomi paddle (purple)
-  ctx.fillStyle = "violet";
-  ctx.fillRect(canvas.width - 20, naomiY, paddleWidth, paddleHeight);
+  julietteY = clientY - rect.top - paddleH / 2;
+  julietteY = Math.max(0, Math.min(canvas.height - paddleH, julietteY));
 }
 
-/* UPDATE */
-function update() {
-  if(gameOver) return;
+canvas.addEventListener("mousemove", e => moveJuliette(e.clientY));
+canvas.addEventListener("touchmove", e => {
+  e.preventDefault();
+  moveJuliette(e.touches[0].clientY);
+}, { passive: false });
+
+function drawPong() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle = "rgba(255,255,255,.2)";
+  for(let y=0; y<canvas.height; y+=24) {
+    ctx.fillRect(canvas.width/2-1, y, 2, 12);
+  }
+
+  ctx.shadowBlur = 16;
+
+  ctx.shadowColor = "hotpink";
+  ctx.fillStyle = "hotpink";
+  ctx.fillRect(10, julietteY, paddleW, paddleH);
+
+  ctx.shadowColor = "violet";
+  ctx.fillStyle = "violet";
+  ctx.fillRect(canvas.width - 22, naomiY, paddleW, paddleH);
+
+  ctx.shadowColor = "gold";
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.size, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+}
+
+function updatePong() {
+  if (pongOver || !document.getElementById("pongGame").classList.contains("active")) return;
 
   ball.x += ball.vx;
   ball.y += ball.vy;
 
-  // Wall bounce
-  if(ball.y < 0 || ball.y > canvas.height - ball.size) {
+  if(ball.y < ball.size || ball.y > canvas.height - ball.size) {
     ball.vy *= -1;
+    sound("hitSound");
   }
 
-  // Juliette hit
-  if(ball.x < 25 &&
+  naomiY += ((ball.y - paddleH / 2) - naomiY) * 0.075;
+  naomiY = Math.max(0, Math.min(canvas.height - paddleH, naomiY));
+
+  if(ball.x - ball.size < 24 &&
      ball.y > julietteY &&
-     ball.y < julietteY + paddleHeight) {
-    ball.vx *= -1;
+     ball.y < julietteY + paddleH) {
+    ball.vx = Math.abs(ball.vx) + .2;
+    ball.vy += (ball.y - (julietteY + paddleH/2)) * .04;
+    sound("hitSound");
   }
 
-  // Naomi AI movement
-  let target = ball.y - paddleHeight/2;
-  naomiY += (target - naomiY) * 0.08;
-
-  // Naomi hit
-  if(ball.x > canvas.width - 30 &&
+  if(ball.x + ball.size > canvas.width - 24 &&
      ball.y > naomiY &&
-     ball.y < naomiY + paddleHeight) {
-    ball.vx *= -1;
+     ball.y < naomiY + paddleH) {
+    ball.vx = -Math.abs(ball.vx) - .2;
+    ball.vy += (ball.y - (naomiY + paddleH/2)) * .04;
+    sound("hitSound");
   }
 
-  // Score
-  if(ball.x < 0) {
-    nScore++;
-    resetBall();
+  if(ball.x < -20) {
+    pn++;
+    scorePong();
   }
 
-  if(ball.x > canvas.width) {
-    jScore++;
-    resetBall();
+  if(ball.x > canvas.width + 20) {
+    pj++;
+    scorePong();
   }
 
-  document.getElementById("jScore").textContent = jScore;
-  document.getElementById("nScore").textContent = nScore;
+  document.getElementById("pongJScore").textContent = pj;
+  document.getElementById("pongNScore").textContent = pn;
 
-  checkWin();
+  if(pj >= 5) endPong("👑 Juliette wins! Duchess Doo Doo dominates the court.");
+  if(pn >= 5) endPong("🌙 Naomi wins! The mysterious baby AI cannot be stopped.");
 }
 
-/* RESET BALL */
-function resetBall() {
+function scorePong() {
+  sound("scoreSound");
+  navigator.vibrate?.(80);
   ball.x = canvas.width / 2;
   ball.y = canvas.height / 2;
-  ball.vx *= -1;
+  ball.vx = ball.vx > 0 ? -4 : 4;
+  ball.vy = (Math.random() * 4) - 2;
 }
 
-/* WIN */
-function checkWin() {
-  if(jScore >= 5) {
-    endGame("👑 Juliette wins! Duchess Doo Doo dominates the court.");
-  }
-  if(nScore >= 5) {
-    endGame("🌙 Naomi wins! The mysterious baby AI cannot be stopped.");
-  }
+function endPong(msg) {
+  pongOver = true;
+  document.getElementById("pongMessage").textContent = msg;
+  sound("babySound");
+  confetti();
 }
 
-function endGame(msg) {
-  document.getElementById("message").textContent = msg;
-  gameOver = true;
+function resetPong() {
+  pj = 0;
+  pn = 0;
+  pongOver = false;
+  julietteY = 210;
+  naomiY = 210;
+  document.getElementById("pongJScore").textContent = 0;
+  document.getElementById("pongNScore").textContent = 0;
+  document.getElementById("pongMessage").textContent = "Move your finger/mouse to control Juliette. First to 5 wins.";
+  scorePong();
 }
 
-/* RESET GAME */
-function resetGame() {
-  jScore = 0;
-  nScore = 0;
-  gameOver = false;
-  document.getElementById("message").textContent = "";
-  resetBall();
-}
-
-/* LOOP */
 function gameLoop() {
-  update();
-  draw();
+  updatePong();
+  drawPong();
   requestAnimationFrame(gameLoop);
 }
 
