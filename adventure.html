@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Twin Quest: Neon Nursery</title>
+
+<style>
+* { box-sizing: border-box; touch-action: none; }
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #05000a;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+#game {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background: #05000a;
+}
+
+#hud {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.box {
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.25);
+  box-shadow: 0 0 18px rgba(255,105,180,.35);
+  font-weight: bold;
+  text-align: center;
+}
+
+#message {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: min(92vw, 520px);
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.72);
+  border: 1px solid rgba(255,255,255,.25);
+  text-align: center;
+  z-index: 5;
+  box-shadow: 0 0 25px rgba(255,215,0,.35);
+}
+
+#menu {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top left, rgba(255,105,180,.35), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(150,80,255,.4), transparent 35%),
+    #05000a;
+  z-index: 10;
+  text-align: center;
+}
+
+.card {
+  width: min(92vw, 520px);
+  padding: 26px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  box-shadow: 0 0 45px rgba(255,105,180,.35);
+}
+
+h1 {
+  font-size: clamp(36px, 10vw, 62px);
+  margin: 0 0 10px;
+  background: linear-gradient(90deg, hotpink, gold, violet, cyan);
+  background-size: 300%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: glow 4s linear infinite;
+}
+
+@keyframes glow {
+  from { background-position: 0%; }
+  to { background-position: 300%; }
+}
+
+button {
+  margin: 8px;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 900;
+  background: linear-gradient(90deg, hotpink, gold, violet);
+  color: #17001f;
+}
+
+#controls {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.touchBtn {
+  position: fixed;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 2px solid rgba(255,255,255,.35);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  pointer-events: auto;
+  backdrop-filter: blur(6px);
+}
+
+#attackBtn { right: 22px; bottom: 34px; }
+#dashBtn { right: 105px; bottom: 34px; }
+
+#joyBase {
+  position: fixed;
+  left: 28px;
+  bottom: 34px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.09);
+  border: 2px solid rgba(255,255,255,.25);
+  pointer-events: auto;
+}
+
+#joyStick {
+  position: absolute;
+  left: 38px;
+  top: 38px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,105,180,.85);
+  box-shadow: 0 0 20px hotpink;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="hud">
+  <div class="box">HP: <span id="hp">10</span>/10</div>
+  <div class="box">LVL: <span id="lvl">1</span> | XP: <span id="xp">0</span></div>
+  <div class="box">Relics: <span id="relics">0</span>/6</div>
+</div>
+
+<div id="message">Quest: Collect 6 glowing relics, protect Naomi, and defeat the Diaper Dragon.</div>
+
+<div id="controls">
+  <div id="joyBase"><div id="joyStick"></div></div>
+  <div id="dashBtn" class="touchBtn">💨</div>
+  <div id="attackBtn" class="touchBtn">⚔️</div>
+</div>
+
+<div id="menu">
+  <div class="card">
+    <h1>Twin Quest</h1>
+    <p><b>Neon Nursery: Diaper Dragon Saga</b></p>
+    <p>Explore, fight, level up, collect relics, and survive the final boss.</p>
+    <button onclick="startGame()">Start Adventure</button>
+    <button onclick="location.href='index.html'">Back to Menu</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let W, H;
+function resize() {
+  W = canvas.width = innerWidth;
+  H = canvas.height = innerHeight;
+}
+addEventListener("resize", resize);
+resize();
+
+let audioCtx;
+let musicTimer;
+let started = false;
+
+function initAudio() {
+  if (!audioCtx) audioCtx = new (AudioContext || webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+}
+
+function tone(freq, dur=.1, type="sine", vol=.05) {
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + dur);
+  o.connect(g);
+  g.connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime + dur);
+}
+
+function sfxAttack(){ tone(220,.05,"square",.07); setTimeout(()=>tone(480,.08,"triangle",.05),40); }
+function sfxHit(){ tone(100,.12,"sawtooth",.08); }
+function sfxCollect(){ tone(880,.08,"triangle",.08); setTimeout(()=>tone(1320,.12,"sine",.06),75); }
+function sfxLevel(){ tone(523,.1,"triangle",.07); setTimeout(()=>tone(784,.12,"triangle",.07),90); setTimeout(()=>tone(1046,.18,"sine",.07),190); }
+
+function startMusic() {
+  const notes = [146.8,174.6,220,261.6,293.6,261.6,220,174.6];
+  let i = 0;
+  clearInterval(musicTimer);
+  musicTimer = setInterval(() => {
+    tone(notes[i % notes.length], .22, "triangle", .025);
+    if (i % 4 === 0) tone(73.4, .16, "sine", .022);
+    if (state.bossAwake && i % 2 === 0) tone(55, .09, "sawtooth", .02);
+    i++;
+  }, state.bossAwake ? 150 : 230);
+}
+
+const keys = {};
+addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+let joy = { active:false, x:0, y:0 };
+const joyBase = document.getElementById("joyBase");
+const joyStick = document.getElementById("joyStick");
+
+joyBase.addEventListener("touchstart", e => {
+  joy.active = true;
+}, {passive:false});
+
+joyBase.addEventListener("touchmove", e => {
+  e.preventDefault();
+  const r = joyBase.getBoundingClientRect();
+  const cx = r.left + r.width/2;
+  const cy = r.top + r.height/2;
+  let dx = e.touches[0].clientX - cx;
+  let dy = e.touches[0].clientY - cy;
+  const d = Math.hypot(dx,dy);
+  if (d > 42) { dx = dx/d*42; dy = dy/d*42; }
+  joy.x = dx / 42;
+  joy.y = dy / 42;
+  joyStick.style.left = 38 + dx + "px";
+  joyStick.style.top = 38 + dy + "px";
+}, {passive:false});
+
+joyBase.addEventListener("touchend", () => {
+  joy.active = false;
+  joy.x = joy.y = 0;
+  joyStick.style.left = "38px";
+  joyStick.style.top = "38px";
+});
+
+document.getElementById("attackBtn").onclick = () => attack();
+document.getElementById("dashBtn").onclick = () => dash();
+
+let state;
+
+function createState() {
+  return {
+    cam:{x:0,y:0},
+    world:{w:1800,h:1400},
+    player:{x:180,y:1100,r:20,hp:10,maxHp:10,lvl:1,xp:0,atk:1,dash:0,inv:0},
+    naomi:{x:135,y:1138,r:17,hp:6},
+    relics:[],
+    enemies:[],
+    particles:[],
+    floatText:[],
+    boss:{x:1540,y:230,r:55,hp:24,maxHp:24,phase:1,cool:0},
+    relicCount:0,
+    bossAwake:false,
+    won:false,
+    gameOver:false
+  };
+}
+
+function resetAdventure() {
+  state = createState();
+
+  for (let i=0;i<6;i++) {
+    state.relics.push({
+      x: 260 + Math.random()*1250,
+      y: 180 + Math.random()*950,
+      r: 16,
+      taken:false
+    });
+  }
+
+  for (let i=0;i<15;i++) {
+    state.enemies.push({
+      x: 250 + Math.random()*1300,
+      y: 200 + Math.random()*980,
+      r: 19,
+      hp: 3,
+      maxHp: 3,
+      vx:(Math.random()-.5)*1.8,
+      vy:(Math.random()-.5)*1.8,
+      stun:0,
+      type: Math.random() < .25 ? "brute" : "goblin"
+    });
+  }
+
+  updateHud();
+}
+
+function startGame() {
+  initAudio();
+  document.getElementById("menu").style.display = "none";
+  started = true;
+  resetAdventure();
+  startMusic();
+}
+
+function updateHud() {
+  hp.textContent = Math.max(0,state.player.hp);
+  lvl.textContent = state.player.lvl;
+  xp.textContent = state.player.xp;
+  relics.textContent = state.relicCount;
+}
+
+function msg(t) {
+  message.textContent = t;
+}
+
+function dist(a,b) {
+  return Math.hypot(a.x-b.x,a.y-b.y);
+}
+
+function particle(x,y,color,count=18) {
+  for (let i=0;i<count;i++) {
+    state.particles.push({
+      x,y,
+      vx:(Math.random()-.5)*6,
+      vy:(Math.random()-.5)*6,
+      life:35,
+      color
+    });
+  }
+}
+
+function textPop(x,y,text,color="white") {
+  state.floatText.push({x,y,text,color,life:45});
+}
+
+function gainXp(v) {
+  state.player.xp += v;
+  if (state.player.xp >= state.player.lvl * 5) {
+    state.player.xp = 0;
+    state.player.lvl++;
+    state.player.maxHp++;
+    state.player.hp = state.player.maxHp;
+    state.player.atk++;
+    sfxLevel();
+    msg("Level up! Juliette’s royal power increased.");
+  }
+  updateHud();
+}
+
+function attack() {
+  if (!started || state.gameOver || state.won) return;
+
+  sfxAttack();
+  const p = state.player;
+  particle(p.x,p.y,"hotpink",10);
+
+  state.enemies.forEach(e => {
+    if (e.hp > 0 && dist(p,e) < 75) {
+      e.hp -= p.atk;
+      e.stun = 15;
+      particle(e.x,e.y,"lime",18);
+      textPop(e.x,e.y,"-"+p.atk,"#ff8");
+      sfxHit();
+      if (e.hp <= 0) {
+        gainXp(2);
+        textPop(e.x,e.y,"XP","#8ff");
+      }
+    }
+  });
+
+  if (state.bossAwake && dist(p,state.boss) < 95) {
+    state.boss.hp -= p.atk;
+    particle(state.boss.x,state.boss.y,"orange",25);
+    textPop(state.boss.x,state.boss.y,"-"+p.atk,"gold");
+    sfxHit();
+
+    if (state.boss.hp <= 0) {
+      state.won = true;
+      msg("VICTORY! Juliette and Naomi defeated the Diaper Dragon and saved nap time.");
+      sfxLevel();
+      massiveConfetti();
+    }
+  }
+}
+
+function dash() {
+  const p = state.player;
+  if (p.dash > 0) return;
+  let dx = 0, dy = 0;
+  if (keys["w"]||keys["arrowup"]) dy -= 1;
+  if (keys["s"]||keys["arrowdown"]) dy += 1;
+  if (keys["a"]||keys["arrowleft"]) dx -= 1;
+  if (keys["d"]||keys["arrowright"]) dx += 1;
+  if (joy.active) { dx = joy.x; dy = joy.y; }
+
+  const d = Math.hypot(dx,dy) || 1;
+  p.x += dx/d * 110;
+  p.y += dy/d * 110;
+  p.dash = 55;
+  particle(p.x,p.y,"cyan",22);
+}
+
+function damagePlayer(v, source) {
+  const p = state.player;
+  if (p.inv > 0) return;
+  p.hp -= v;
+  p.inv = 45;
+  sfxHit();
+  particle(p.x,p.y,"red",25);
+  textPop(p.x,p.y,"-"+v,"red");
+  updateHud();
+
+  if (source) {
+    const dx = p.x - source.x;
+    const dy = p.y - source.y;
+    const d = Math.hypot(dx,dy)||1;
+    p.x += dx/d*35;
+    p.y += dy/d*35;
+  }
+
+  if (p.hp <= 0) {
+    state.gameOver = true;
+    msg("Quest failed. The diaper chaos was too strong. Refresh or restart to try again.");
+  }
+}
+
+function update() {
+  if (!started || state.gameOver || state.won) return;
+
+  const p = state.player;
+  let dx = 0, dy = 0;
+
+  if (keys["w"]||keys["arrowup"]) dy -= 1;
+  if (keys["s"]||keys["arrowdown"]) dy += 1;
+  if (keys["a"]||keys["arrowleft"]) dx -= 1;
+  if (keys["d"]||keys["arrowright"]) dx += 1;
+  if (keys[" "]) attack();
+  if (keys["shift"]) dash();
+
+  if (joy.active) {
+    dx = joy.x;
+    dy = joy.y;
+  }
+
+  const d = Math.hypot(dx,dy);
+  const speed = 3.4 + state.player.lvl * .15;
+
+  if (d > .1) {
+    p.x += dx/d * speed;
+    p.y += dy/d * speed;
+  }
+
+  p.x = Math.max(30, Math.min(state.world.w-30, p.x));
+  p.y = Math.max(30, Math.min(state.world.h-30, p.y));
+
+  if (p.inv > 0) p.inv--;
+  if (p.dash > 0) p.dash--;
+
+  const n = state.naomi;
+  const ndx = p.x - 48 - n.x;
+  const ndy = p.y + 38 - n.y;
+  const nd = Math.hypot(ndx,ndy);
+  if (nd > 5) {
+    n.x += ndx/nd * 2.6;
+    n.y += ndy/nd * 2.6;
+  }
+
+  state.relics.forEach(r => {
+    if (!r.taken && Math.hypot(p.x-r.x,p.y-r.y) < p.r+r.r) {
+      r.taken = true;
+      state.relicCount++;
+      sfxCollect();
+      particle(r.x,r.y,"gold",30);
+      textPop(r.x,r.y,"Relic!","gold");
+      gainXp(1);
+      updateHud();
+
+      if (state.relicCount >= 6 && !state.bossAwake) {
+        state.bossAwake = true;
+        msg("The Diaper Dragon awakens! Go to the glowing lair and attack!");
+        clearInterval(musicTimer);
+        startMusic();
+      }
+    }
+  });
+
+  state.enemies.forEach(e => {
+    if (e.hp <= 0) return;
+
+    if (e.stun > 0) {
+      e.stun--;
+      return;
+    }
+
+    const chase = Math.hypot(p.x-e.x,p.y-e.y) < 260;
+    if (chase) {
+      const ex = p.x - e.x;
+      const ey = p.y - e.y;
+      const ed = Math.hypot(ex,ey)||1;
+      const sp = e.type === "brute" ? 1.55 : 2.05;
+      e.x += ex/ed*sp;
+      e.y += ey/ed*sp;
+    } else {
+      e.x += e.vx;
+      e.y += e.vy;
+    }
+
+    if (e.x<40 || e.x>state.world.w-40) e.vx *= -1;
+    if (e.y<40 || e.y>state.world.h-40) e.vy *= -1;
+
+    if (Math.hypot(p.x-e.x,p.y-e.y) < p.r+e.r) {
+      damagePlayer(e.type === "brute" ? 2 : 1, e);
+    }
+  });
+
+  if (state.bossAwake) {
+    const b = state.boss;
+    b.cool--;
+
+    const bx = p.x-b.x;
+    const by = p.y-b.y;
+    const bd = Math.hypot(bx,by)||1;
+
+    if (bd < 520) {
+      b.x += bx/bd * (b.hp < 12 ? 1.8 : 1.15);
+      b.y += by/bd * (b.hp < 12 ? 1.8 : 1.15);
+    }
+
+    if (bd < p.r+b.r) damagePlayer(2,b);
+
+    if (b.cool <= 0) {
+      b.cool = b.hp < 12 ? 45 : 75;
+      const ang = Math.atan2(by,bx);
+      for (let i=-1;i<=1;i++) {
+        state.enemies.push({
+          x:b.x+Math.cos(ang+i*.35)*60,
+          y:b.y+Math.sin(ang+i*.35)*60,
+          r:10,
+          hp:1,
+          maxHp:1,
+          vx:Math.cos(ang+i*.35)*3,
+          vy:Math.sin(ang+i*.35)*3,
+          stun:0,
+          type:"fire"
+        });
+      }
+      particle(b.x,b.y,"orange",18);
+    }
+  }
+
+  state.particles.forEach(pt => {
+    pt.x += pt.vx;
+    pt.y += pt.vy;
+    pt.life--;
+  });
+  state.particles = state.particles.filter(pt => pt.life > 0);
+
+  state.floatText.forEach(t => {
+    t.y -= 1;
+    t.life--;
+  });
+  state.floatText = state.floatText.filter(t => t.life > 0);
+
+  state.cam.x = p.x - W/2;
+  state.cam.y = p.y - H/2;
+  state.cam.x = Math.max(0, Math.min(state.world.w-W, state.cam.x));
+  state.cam.y = Math.max(0, Math.min(state.world.h-H, state.cam.y));
+}
+
+function worldToScreen(x,y) {
+  return { x:x-state.cam.x, y:y-state.cam.y };
+}
+
+function drawGrid() {
+  ctx.fillStyle = "#080010";
+  ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle = "rgba(255,255,255,.06)";
+  ctx.lineWidth = 1;
+
+  const startX = -state.cam.x % 60;
+  const startY = -state.cam.y % 60;
+
+  for(let x=startX; x<W; x+=60) {
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,H);
+    ctx.stroke();
+  }
+
+  for(let y=startY; y<H; y+=60) {
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(W,y);
+    ctx.stroke();
+  }
+}
+
+function drawCircleObj(o,color,glow,label) {
+  const s = worldToScreen(o.x,o.y);
+  ctx.shadowBlur = glow;
+  ctx.shadowColor = color;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(s.x,s.y,o.r,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  if (label) {
+    ctx.font = `${o.r+8}px Arial`;
+    ctx.textAlign = "center";
+    ctx.fillText(label,s.x,s.y+o.r/2);
+  }
+}
+
+function draw() {
+  if (!started) return;
+
+  drawGrid();
+
+  const lair = worldToScreen(1540,230);
+  ctx.shadowBlur = 35;
+  ctx.shadowColor = "orange";
+  ctx.fillStyle = "rgba(255,100,0,.18)";
+  ctx.beginPath();
+  ctx.arc(lair.x,lair.y,95,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  state.relics.forEach(r => {
+    if (r.taken) return;
+    drawCircleObj(r,"gold",24,"💎");
+  });
+
+  state.enemies.forEach(e => {
+    if (e.hp <= 0) return;
+    const color = e.type === "brute" ? "#79ff44" : e.type === "fire" ? "orange" : "#42ff8a";
+    const label = e.type === "fire" ? "🔥" : "💩";
+    drawCircleObj(e,color,18,label);
+
+    const s = worldToScreen(e.x,e.y);
+    ctx.fillStyle="red";
+    ctx.fillRect(s.x-16,s.y-e.r-14,32,4);
+    ctx.fillStyle="lime";
+    ctx.fillRect(s.x-16,s.y-e.r-14,32*(e.hp/e.maxHp),4);
+  });
+
+  if (state.bossAwake && state.boss.hp > 0) {
+    drawCircleObj(state.boss,"#ff6500",38,"🐉");
+    const s = worldToScreen(state.boss.x,state.boss.y);
+    ctx.fillStyle="red";
+    ctx.fillRect(s.x-50,s.y-75,100,8);
+    ctx.fillStyle="gold";
+    ctx.fillRect(s.x-50,s.y-75,100*(state.boss.hp/state.boss.maxHp),8);
+  }
+
+  drawCircleObj(state.naomi,"violet",25,"🌙");
+
+  if (state.player.inv % 6 < 3) {
+    drawCircleObj(state.player,"hotpink",30,"👑");
+  }
+
+  state.particles.forEach(pt => {
+    const s = worldToScreen(pt.x,pt.y);
+    ctx.globalAlpha = pt.life/35;
+    ctx.fillStyle = pt.color;
+    ctx.shadowColor = pt.color;
+    ctx.shadowBlur = 14;
+    ctx.fillRect(s.x,s.y,5,5);
+  });
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+
+  state.floatText.forEach(t => {
+    const s = worldToScreen(t.x,t.y);
+    ctx.globalAlpha = t.life/45;
+    ctx.fillStyle = t.color;
+    ctx.font = "bold 18px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(t.text,s.x,s.y);
+  });
+  ctx.globalAlpha = 1;
+
+  drawMiniMap();
+}
+
+function drawMiniMap() {
+  const mw = 135, mh = 95;
+  const x = W - mw - 14;
+  const y = 82;
+
+  ctx.fillStyle = "rgba(0,0,0,.55)";
+  ctx.fillRect(x,y,mw,mh);
+  ctx.strokeStyle = "gold";
+  ctx.strokeRect(x,y,mw,mh);
+
+  function mapPoint(o,color,size=4) {
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.arc(x + (o.x/state.world.w)*mw, y + (o.y/state.world.h)*mh, size,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  state.relics.forEach(r => !r.taken && mapPoint(r,"gold",3));
+  state.enemies.forEach(e => e.hp>0 && mapPoint(e,"lime",2));
+  if (state.bossAwake) mapPoint(state.boss,"orange",5);
+  mapPoint(state.naomi,"violet",4);
+  mapPoint(state.player,"hotpink",5);
+}
+
+function massiveConfetti() {
+  for (let i=0;i<160;i++) {
+    setTimeout(()=>particle(state.player.x,state.player.y,["gold","hotpink","cyan","violet"][Math.floor(Math.random()*4)],8),i*8);
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+
+</body>
+</html>
