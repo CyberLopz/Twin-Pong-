@@ -173,8 +173,8 @@ canvas {
   <p>Juliette vs Naomi: baby chaos edition</p>
 
   <div class="card">
-    <img src="juliette.jpg?v=50" class="menu-img">
-    <img src="naomi.jpg?v=50" class="menu-img">
+    <img src="juliette.jpg?v=60" class="menu-img">
+    <img src="naomi.jpg?v=60" class="menu-img">
     <h2>Choose Your Game</h2>
     <button onclick="goScreen('coinGame')">🪙 Flip for a Twin</button>
     <button onclick="goScreen('pongGame')">🏓 Twin Pong</button>
@@ -196,12 +196,12 @@ canvas {
       <div class="coin-edge"></div>
 
       <div id="julietteFace" class="coin-face juliette-glow">
-        <img src="juliette.jpg?v=50" class="coin-img">
+        <img src="juliette.jpg?v=60" class="coin-img">
         <div class="label">Juliette</div>
       </div>
 
       <div id="naomiFace" class="coin-face naomi-glow">
-        <img src="naomi.jpg?v=50" class="coin-img">
+        <img src="naomi.jpg?v=60" class="coin-img">
         <div class="label">Naomi</div>
       </div>
     </div>
@@ -233,6 +233,7 @@ canvas {
   <button onclick="goScreen('home')">⬅ MENU</button>
 </div>
 
+<!-- SOUND EFFECTS -->
 <audio id="clickSound">
   <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3">
 </audio>
@@ -253,8 +254,14 @@ canvas {
   <source src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3">
 </audio>
 
-<audio id="bgMusic" loop>
+<!-- MENU BGM -->
+<audio id="menuMusic" loop>
   <source src="https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3">
+</audio>
+
+<!-- INTENSE PONG BGM -->
+<audio id="pongMusic" loop>
+  <source src="https://assets.mixkit.co/active_storage/sfx/226/226-preview.mp3">
 </audio>
 
 <script>
@@ -269,20 +276,55 @@ function sound(id) {
   } catch(e) {}
 }
 
-function goScreen(id) {
-  sound("clickSound");
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+function stopAllMusic() {
+  const menu = document.getElementById("menuMusic");
+  const pong = document.getElementById("pongMusic");
+
+  menu.pause();
+  pong.pause();
+
+  menu.currentTime = 0;
+  pong.currentTime = 0;
+}
+
+function updateMusic() {
+  if (!musicOn) return;
+
+  stopAllMusic();
+
+  try {
+    if (document.getElementById("home").classList.contains("active")) {
+      document.getElementById("menuMusic").play();
+    }
+
+    if (document.getElementById("pongGame").classList.contains("active")) {
+      document.getElementById("pongMusic").play();
+    }
+  } catch(e) {}
 }
 
 function toggleMusic() {
-  const m = document.getElementById("bgMusic");
   musicOn = !musicOn;
-  musicOn ? m.play() : m.pause();
+
+  if (musicOn) {
+    updateMusic();
+  } else {
+    stopAllMusic();
+  }
+}
+
+function goScreen(id) {
+  sound("clickSound");
+
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  updateMusic();
 }
 
 function confetti() {
   const colors = ["gold","hotpink","cyan","white","violet"];
+
   for(let i=0;i<45;i++){
     const c = document.createElement("div");
     c.className = "confetti";
@@ -349,9 +391,11 @@ function flipCoin() {
 function resetCoin() {
   coinJ = 0;
   coinN = 0;
+
   document.getElementById("coinJScore").textContent = 0;
   document.getElementById("coinNScore").textContent = 0;
   document.getElementById("coinResult").textContent = "Scores reset. The twin council awaits.";
+
   showFace("Juliette");
 }
 
@@ -382,6 +426,7 @@ function moveJuliette(clientY) {
 }
 
 canvas.addEventListener("mousemove", e => moveJuliette(e.clientY));
+
 canvas.addEventListener("touchmove", e => {
   e.preventDefault();
   moveJuliette(e.touches[0].clientY);
@@ -464,6 +509,7 @@ function updatePong() {
 function scorePong() {
   sound("scoreSound");
   navigator.vibrate?.(80);
+
   ball.x = canvas.width / 2;
   ball.y = canvas.height / 2;
   ball.vx = ball.vx > 0 ? -4 : 4;
@@ -483,9 +529,11 @@ function resetPong() {
   pongOver = false;
   julietteY = 210;
   naomiY = 210;
+
   document.getElementById("pongJScore").textContent = 0;
   document.getElementById("pongNScore").textContent = 0;
   document.getElementById("pongMessage").textContent = "Move your finger/mouse to control Juliette. First to 5 wins.";
+
   scorePong();
 }
 
